@@ -18,15 +18,16 @@ package com.stfalcon.imageviewer.viewer.view
 
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.DecelerateInterpolator
+import android.view.animation.*
 import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.transition.AutoTransition
 import androidx.transition.Transition
 import androidx.transition.TransitionManager
 import com.stfalcon.imageviewer.common.extensions.*
+import kotlin.math.max
 
-internal class TransitionImageAnimator(
+internal class OldTransitionImageAnimator(
     private val externalImage: ImageView?,
     private val internalImage: ImageView,
     private val internalImageContainer: FrameLayout
@@ -149,4 +150,205 @@ internal class TransitionImageAnimator(
             .setDuration(transitionDuration)
             .setInterpolator(DecelerateInterpolator())
             .addListener(onTransitionEnd = { onTransitionEnd?.invoke() })
+}
+
+internal class TransitionImageAnimator(
+    private val externalImage: ImageView?,
+    private val internalImage: ImageView,
+    private val internalImageContainer: FrameLayout
+) {
+
+    companion object {
+        private const val TRANSITION_DURATION = 250L
+    }
+
+    private val internalRoot: ViewGroup
+        get() = internalImageContainer.parent as ViewGroup
+
+    internal var isAnimating = false
+    private var isClosing = false
+    private var scaleNumber: Float = 1f
+    private var resetToXValue: Float = 0f
+    private var resetToYValue: Float = 0f
+
+    internal fun animateOpen(
+        containerPadding: IntArray,
+        onTransitionStart: (Long) -> Unit,
+        onTransitionEnd: () -> Unit
+    ) {
+        updateTransitionView()
+        if (externalImage.isRectVisible) {
+            onTransitionStart(TRANSITION_DURATION)
+            doOpenTransition(containerPadding, onTransitionEnd)
+        } else {
+            onTransitionEnd()
+        }
+    }
+
+    internal fun animateClose(
+        shouldDismissToBottom: Boolean,
+        onTransitionStart: (Long) -> Unit,
+        onTransitionEnd: () -> Unit
+    ) {
+        updateTransitionView()
+        if (externalImage.isRectVisible && !shouldDismissToBottom) {
+            onTransitionStart(TRANSITION_DURATION)
+            doCloseTransition(onTransitionEnd)
+        } else {
+            onTransitionEnd()
+        }
+    }
+
+    private fun doOpenTransition(containerPadding: IntArray, onTransitionEnd: () -> Unit) {
+        isAnimating = true
+        internalRoot.applyMargin(
+            containerPadding[0],
+            containerPadding[1],
+            containerPadding[2],
+            containerPadding[3])
+        startAnimation(internalImage, externalImage, onTransitionEnd, true)
+    }
+
+
+    private fun doCloseTransition(onTransitionEnd: () -> Unit) {
+        isAnimating = true
+        isClosing = true
+        startAnimation(internalImage, externalImage, onTransitionEnd, false)
+    }
+
+    fun updateTransitionView() {
+        if (externalImage == null) {
+            scaleNumber = 1f
+            resetToXValue = 0f
+            resetToYValue = 0f
+            return
+        }
+        val itemView = internalImage
+        val scaleX = externalImage.width * 1f / itemView.width
+        val scaleY = externalImage.height * 1f / itemView.height
+        scaleNumber = max(scaleX, scaleY)
+
+        // target center location
+        val location = IntArray(2)
+        externalImage.getLocationOnScreen(location)
+
+        val externalCenterX = (location[0] + externalImage.width / 2)
+        val externalCenterY = (location[1] + externalImage.height / 2)
+
+        // center of itemView
+        val itemViewLocation = IntArray(2)
+        itemView.getLocationOnScreen(itemViewLocation)
+
+        val centerX = itemViewLocation[0] + itemView.width / 2
+        val centerY = itemViewLocation[1] + itemView.height / 2
+
+        val toXValue = (externalCenterX - centerX) * 1f
+        val toYValue = (externalCenterY - centerY) * 1f
+
+        resetToXValue = toXValue
+        resetToYValue = toYValue
+    }
+
+    private fun startAnimation(
+        itemView: View?,
+        externalImage: View?,
+        onTransitionEnd: (() -> Unit)? = null,
+        isOpen: Boolean
+    ) {
+        if (itemView == null || externalImage == null) {
+            return
+        }
+        val scaleX = externalImage.width * 1f / itemView.width
+        val scaleY = externalImage.height * 1f / itemView.height
+        val toX = max(scaleX, scaleY)
+
+        scaleNumber = toX
+        // scale itself by center
+        val scaleAnimation: ScaleAnimation = if (isOpen) {
+            ScaleAnimation(
+                toX,
+                1f,
+                toX,
+                1f,
+                Animation.RELATIVE_TO_SELF,
+                0.5f,
+                Animation.RELATIVE_TO_SELF,
+                0.5f
+            )
+        } else {
+            ScaleAnimation(
+                1f,
+                toX,
+                1f,
+                toX,
+                Animation.RELATIVE_TO_SELF,
+                0.5f,
+                Animation.RELATIVE_TO_SELF,
+                0.5f
+            )
+        }
+
+        // target center location
+        val location = IntArray(2)
+        externalImage.getLocationOnScreen(location)
+
+        val externalCenterX = (location[0] + externalImage.width / 2)
+        val externalCenterY = (location[1] + externalImage.height / 2)
+
+        // center of itemView
+        val itemViewLocation = IntArray(2)
+        itemView.getLocationOnScreen(itemViewLocation)
+
+
+        val centerX = itemViewLocation[0] + itemView.width / 2
+        val centerY = itemViewLocation[1] + itemView.height / 2
+
+        val toXValue = (externalCenterX - centerX) * 1f
+        val toYValue = (externalCenterY - centerY) * 1f
+
+        resetToXValue = toXValue
+        resetToYValue = toYValue
+
+        val translateAnimation: TranslateAnimation = if (isOpen) {
+            TranslateAnimation(
+                Animation.ABSOLUTE, toXValue,
+                Animation.ABSOLUTE, 0f,
+                Animation.ABSOLUTE, toYValue,
+                Animation.ABSOLUTE, 0f
+            )
+        } else {
+            TranslateAnimation(
+                Animation.ABSOLUTE, 0f,
+                Animation.ABSOLUTE, toXValue,
+                Animation.ABSOLUTE, 0f,
+                Animation.ABSOLUTE, toYValue
+            )
+        }
+
+        val animationSet = AnimationSet(true)
+        animationSet.addAnimation(scaleAnimation)
+        animationSet.addAnimation(translateAnimation)
+        animationSet.duration = TRANSITION_DURATION
+        animationSet.fillAfter = true
+        itemView.startAnimation(animationSet)
+
+        animationSet.setAnimationListener(object : Animation.AnimationListener {
+            override fun onAnimationStart(p0: Animation?) {
+
+            }
+
+            override fun onAnimationEnd(p0: Animation?) {
+                externalImage.visibility = View.VISIBLE
+                if (!isClosing) {
+                    isAnimating = false
+                }
+                onTransitionEnd?.invoke()
+            }
+
+            override fun onAnimationRepeat(p0: Animation?) {
+
+            }
+        })
+    }
+
 }

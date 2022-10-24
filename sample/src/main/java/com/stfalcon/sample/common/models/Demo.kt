@@ -6,6 +6,7 @@ object Demo {
     private const val MISC_PATH = "https://raw.githubusercontent.com/stfalcon-studio/StfalconImageViewer/master/images/misc"
 
     val posters = listOf(
+        Poster(url = "$MISC_PATH/horizontal_colorful_1.jpg", description = ""),
         Poster(url = "$POSTERS_PATH/Vincent.jpg", description = "Vincent Vega is a hitman and associate of Marsellus Wallace. He had a brother named Vic Vega who was shot and killed by an undercover cop while on a job. He worked in Amsterdam for over three years and recently returned to Los Angeles, where he has been partnered with Jules Winnfield."),
         Poster(url = "$POSTERS_PATH/Jules.jpg", description = "Jules Winnfield - initially he is a Hitman working alongside Vincent Vega but after revelation, or as he refers to it \"a moment of clarity\" he decides to leave to \"Walk the Earth.\" During the film he is stated to be from Inglewood, California"),
         Poster(url = "$POSTERS_PATH/Korben.jpg", description = "Korben Dallas. A post-America taxi driver in New York City with a grand military background simply lives his life day to day, that is, before he meets Leeloo. Leeloo captures his heart soon after crashing into his taxi cab one day after escaping from a government-run laboratory. Korben soon finds himself running from the authorities in order to protect Leeloo, as well as becoming the center of a desperate ploy to save the world from an unknown evil."),
