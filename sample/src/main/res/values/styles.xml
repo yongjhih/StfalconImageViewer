@@ -26,4 +26,14 @@
         <item name="android:ellipsize">end</item>
     </style>
 
+
+    <style name="DotTabLayout" parent="Widget.Design.TabLayout">
+        <item name="tabBackground">@drawable/ic_dot_indicator_sl</item>
+        <item name="tabGravity">fill</item>
+        <item name="tabIndicatorHeight">0dp</item>
+        <item name="tabMaxWidth">30dp</item>
+        <item name="tabPaddingStart">8dp</item>
+        <item name="tabPaddingEnd">8dp</item>
+        <item name="tabIndicatorFullWidth">false</item>
+    </style>
 </resources>

@@ -6,12 +6,17 @@ android {
     compileSdkVersion 30
     defaultConfig {
         applicationId "com.stfalcon.stfalconimageviewersample"
-        minSdkVersion 19
+        minSdkVersion 21
         targetSdkVersion 30
         versionCode 1
         versionName "1.0"
 
         vectorDrawables.useSupportLibrary = true
+    }
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+    kotlinOptions {
+        jvmTarget = "1.8"
     }
     buildTypes {
         release {
@@ -30,8 +35,10 @@ dependencies {
     implementation "com.github.chrisbanes:PhotoView:2.2.0"
     implementation 'androidx.constraintlayout:constraintlayout:2.0.0-beta3'
     implementation 'androidx.coordinatorlayout:coordinatorlayout:1.1.0-rc01'
+    implementation("app.cash.contour:contour:1.1.0")
 
     //UI
     implementation 'com.squareup.picasso:picasso:2.71828'
     implementation 'me.relex:circleindicator:2.1.0'
+    implementation 'com.google.android.material:material:1.4.0'
 }
