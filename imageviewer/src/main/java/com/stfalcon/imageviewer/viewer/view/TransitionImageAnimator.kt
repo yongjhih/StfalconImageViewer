@@ -21,13 +21,10 @@ import android.view.ViewGroup
 import android.view.animation.*
 import android.widget.FrameLayout
 import android.widget.ImageView
-import androidx.transition.AutoTransition
-import androidx.transition.Transition
-import androidx.transition.TransitionManager
+import androidx.transition.*
 import com.stfalcon.imageviewer.common.extensions.*
-import kotlin.math.max
 
-internal class OldTransitionImageAnimator(
+internal class TransitionImageAnimator(
     private val externalImage: ImageView?,
     private val internalImage: ImageView,
     private val internalImageContainer: FrameLayout
@@ -110,6 +107,7 @@ internal class OldTransitionImageAnimator(
         TransitionManager.beginDelayedTransition(
             internalRoot, createTransition { handleCloseTransitionEnd(onTransitionEnd) })
 
+        internalImage.scaleType = externalImage?.scaleType ?: ImageView.ScaleType.CENTER_CROP
         prepareTransitionLayout()
         internalImageContainer.requestLayout()
     }
@@ -145,14 +143,32 @@ internal class OldTransitionImageAnimator(
             .start()
     }
 
+    /**
+     * ```
+     * AutoTransition()
+     *     .setDuration(transitionDuration)
+     *     .setInterpolator(DecelerateInterpolator())
+     *     .addListener(onTransitionEnd = { onTransitionEnd?.invoke() })
+     * ```
+     */
     private fun createTransition(onTransitionEnd: (() -> Unit)? = null): Transition =
-        AutoTransition()
-            .setDuration(transitionDuration)
-            .setInterpolator(DecelerateInterpolator())
-            .addListener(onTransitionEnd = { onTransitionEnd?.invoke() })
+        TransitionSet().apply {
+            ordering = TransitionSet.ORDERING_SEQUENTIAL
+            addTransition(Fade(Fade.OUT)).apply {
+                ordering = TransitionSet.ORDERING_TOGETHER
+                //addTransition(ChangeClipBounds())
+                //addTransition(ChangeTransform())
+                addTransition(ChangeBounds())
+                addTransition(ChangeImageTransform())
+            }.addTransition(Fade(Fade.IN))
+        }.
+        setDuration(transitionDuration).
+        setInterpolator(DecelerateInterpolator()).
+        addListener(onTransitionEnd = { onTransitionEnd?.invoke() })
 }
 
-internal class TransitionImageAnimator(
+/*
+internal class CenterTransitionImageAnimator(
     private val externalImage: ImageView?,
     private val internalImage: ImageView,
     private val internalImageContainer: FrameLayout
@@ -352,3 +368,4 @@ internal class TransitionImageAnimator(
     }
 
 }
+*/

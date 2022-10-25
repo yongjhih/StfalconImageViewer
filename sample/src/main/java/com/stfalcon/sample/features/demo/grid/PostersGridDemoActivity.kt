@@ -27,6 +27,7 @@ class PostersGridDemoActivity : AppCompatActivity() {
 
     private fun openViewer(startPosition: Int, target: ImageView) {
         viewer = StfalconImageViewer.Builder<Poster>(this, Demo.posters, ::loadPosterImage)
+            .withHiddenStatusBar(false)
             .withStartPosition(startPosition)
             .withTransitionFrom(target)
             .withImageChangeListener {
