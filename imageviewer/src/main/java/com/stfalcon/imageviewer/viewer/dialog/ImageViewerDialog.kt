@@ -98,17 +98,17 @@ internal class ImageViewerDialog<T>(
 
     private fun setupViewerView() {
         viewerView.apply {
-            isZoomingAllowed = builderData.isZoomingAllowed
-            isSwipeToDismissAllowed = builderData.isSwipeToDismissAllowed
+            isZoomingAllowed = this@ImageViewerDialog.builderData.isZoomingAllowed
+            isSwipeToDismissAllowed = this@ImageViewerDialog.builderData.isSwipeToDismissAllowed
 
-            containerPadding = builderData.containerPaddingPixels
-            imagesMargin = builderData.imageMarginPixels
-            overlayView = builderData.overlayView
+            containerPadding = this@ImageViewerDialog.builderData.containerPaddingPixels
+            imagesMargin = this@ImageViewerDialog.builderData.imageMarginPixels
+            overlayView = this@ImageViewerDialog.builderData.overlayView
 
-            setBackgroundColor(builderData.backgroundColor)
-            setImages(builderData.images, builderData.startPosition, builderData.imageLoader)
+            setBackgroundColor(this@ImageViewerDialog.builderData.backgroundColor)
+            setImages(this@ImageViewerDialog.builderData.images, this@ImageViewerDialog.builderData.startPosition, this@ImageViewerDialog.builderData.imageLoader)
 
-            onPageChange = { position -> builderData.imageChangeListener?.onImageChange(position) }
+            onPageChange = { position -> this@ImageViewerDialog.builderData.imageChangeListener?.onImageChange(position) }
             onDismiss = { dialog.dismiss() }
             builderData = this@ImageViewerDialog.builderData
         }

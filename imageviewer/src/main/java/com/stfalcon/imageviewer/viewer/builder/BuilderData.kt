@@ -19,6 +19,7 @@ package com.stfalcon.imageviewer.viewer.builder
 import android.graphics.Color
 import android.view.View
 import android.widget.ImageView
+import androidx.viewpager.widget.ViewPager
 import com.stfalcon.imageviewer.listeners.OnDismissListener
 import com.stfalcon.imageviewer.listeners.OnImageChangeListener
 import com.stfalcon.imageviewer.loader.ImageLoader
@@ -39,4 +40,5 @@ internal class BuilderData<T>(
     var isSwipeToDismissAllowed = true
     var transitionView: ImageView? = null
     var scaleType: ImageView.ScaleType? = null
+    var onPageChangeListener: ViewPager.OnPageChangeListener? = null
 }

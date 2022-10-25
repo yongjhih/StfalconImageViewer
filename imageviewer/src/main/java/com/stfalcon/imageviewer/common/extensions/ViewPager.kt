@@ -18,7 +18,7 @@ package com.stfalcon.imageviewer.common.extensions
 
 import androidx.viewpager.widget.ViewPager
 
-internal fun ViewPager.addOnPageChangeListener(
+internal fun ViewPager.addOnPageChanger(
     onPageScrolled: ((position: Int, offset: Float, offsetPixels: Int) -> Unit)? = null,
     onPageSelected: ((position: Int) -> Unit)? = null,
     onPageScrollStateChanged: ((state: Int) -> Unit)? = null

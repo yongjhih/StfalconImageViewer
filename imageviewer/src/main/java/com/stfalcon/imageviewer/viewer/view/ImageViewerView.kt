@@ -26,8 +26,9 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import androidx.core.view.GestureDetectorCompat
+import androidx.viewpager.widget.ViewPager
 import com.stfalcon.imageviewer.R
-import com.stfalcon.imageviewer.common.extensions.addOnPageChangeListener
+import com.stfalcon.imageviewer.common.extensions.addOnPageChanger
 import com.stfalcon.imageviewer.common.extensions.animateAlpha
 import com.stfalcon.imageviewer.common.extensions.applyMargin
 import com.stfalcon.imageviewer.common.extensions.copyBitmapFrom
@@ -67,6 +68,8 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
 
     internal var onDismiss: (() -> Unit)? = null
     internal var onPageChange: ((position: Int) -> Unit)? = null
+
+    internal var onPageChangeListener: ViewPager.OnPageChangeListener? = null
 
     internal val isScaled
         get() = imagesAdapter?.isScaled(currentPosition) ?: false
@@ -109,7 +112,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
     private var images: List<T> = listOf()
     private var imageLoader: ImageLoader<T>? = null
     private lateinit var transitionImageAnimator: TransitionImageAnimator
-    lateinit var builderData: BuilderData<T>
+    var builderData: BuilderData<T>? = null
 
     private var startPosition: Int = 0
         set(value) {
@@ -136,13 +139,21 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
         transitionImageView = findViewById(R.id.transitionImageView)
 
         imagesPager = findViewById(R.id.imagesPager)
-        imagesPager.addOnPageChangeListener(
+        imagesPager.addOnPageChanger(
             onPageSelected = {
                 externalTransitionImageView?.apply {
                     if (isAtStartPosition) makeInvisible() else makeVisible()
                 }
                 onPageChange?.invoke(it)
-            })
+                builderData?.onPageChangeListener?.onPageSelected(it)
+            },
+            onPageScrolled = { position, positionOffset, positionOffsetPixels ->
+                builderData?.onPageChangeListener?.onPageScrolled(position, positionOffset, positionOffsetPixels)
+            },
+            onPageScrollStateChanged = {
+                builderData?.onPageChangeListener?.onPageScrollStateChanged(it)
+            }
+        )
 
         directionDetector = createSwipeDirectionDetector()
         gestureDetector = createGestureDetector()
@@ -361,6 +372,6 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
             externalImage = transitionImageView,
             internalImage = this.transitionImageView,
             internalImageContainer = this.transitionImageContainer,
-            scaleType = builderData.scaleType
+            scaleType = builderData?.scaleType
         )
 }

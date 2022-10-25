@@ -21,7 +21,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.view.MotionEvent
 import androidx.viewpager.widget.ViewPager
-import com.stfalcon.imageviewer.common.extensions.addOnPageChangeListener
+import com.stfalcon.imageviewer.common.extensions.addOnPageChanger
 
 internal class MultiTouchViewPager @JvmOverloads constructor(
     context: Context,
@@ -36,7 +36,7 @@ internal class MultiTouchViewPager @JvmOverloads constructor(
 
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
-        pageChangeListener = addOnPageChangeListener(
+        pageChangeListener = addOnPageChanger(
             onPageScrollStateChanged = ::onPageScrollStateChanged)
     }
 
