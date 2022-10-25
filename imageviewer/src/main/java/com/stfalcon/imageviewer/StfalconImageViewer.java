@@ -37,7 +37,7 @@ import java.util.List;
 public class StfalconImageViewer<T> {
 
     private Context context;
-    private BuilderData<T> builderData;
+    BuilderData<T> builderData;
     private ImageViewerDialog<T> dialog;
 
     protected StfalconImageViewer(@NonNull Context context, @NonNull BuilderData<T> builderData) {
