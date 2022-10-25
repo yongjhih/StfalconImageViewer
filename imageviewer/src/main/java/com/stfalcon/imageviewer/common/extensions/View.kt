@@ -129,5 +129,5 @@ internal fun View.switchVisibilityWithAnimation() {
     }
 }
 
-val View.rootWindowInsets: WindowInsetsCompat? get() =
+val View.rootWindowInsetsCompat: WindowInsetsCompat? get() =
     ViewCompat.getRootWindowInsets(this)
