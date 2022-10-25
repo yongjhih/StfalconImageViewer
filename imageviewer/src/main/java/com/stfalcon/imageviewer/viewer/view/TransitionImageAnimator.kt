@@ -23,8 +23,9 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import androidx.transition.*
 import com.stfalcon.imageviewer.common.extensions.*
+import kotlin.math.max
 
-internal class TransitionImageAnimator(
+internal class OldTransitionImageAnimator(
     private val externalImage: ImageView?,
     private val internalImage: ImageView,
     private val internalImageContainer: FrameLayout,
@@ -186,11 +187,11 @@ internal class TransitionImageAnimator(
         addListener(onTransitionEnd = onTransitionEnd)
 }
 
-/*
-internal class CenterTransitionImageAnimator(
+internal class TransitionImageAnimator(
     private val externalImage: ImageView?,
     private val internalImage: ImageView,
-    private val internalImageContainer: FrameLayout
+    private val internalImageContainer: FrameLayout,
+    private val scaleType: ImageView.ScaleType? = null
 ) {
 
     companion object {
@@ -387,4 +388,3 @@ internal class CenterTransitionImageAnimator(
     }
 
 }
-*/
