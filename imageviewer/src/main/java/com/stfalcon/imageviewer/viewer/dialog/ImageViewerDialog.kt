@@ -110,6 +110,7 @@ internal class ImageViewerDialog<T>(
 
             onPageChange = { position -> builderData.imageChangeListener?.onImageChange(position) }
             onDismiss = { dialog.dismiss() }
+            builderData = this@ImageViewerDialog.builderData
         }
     }
 }

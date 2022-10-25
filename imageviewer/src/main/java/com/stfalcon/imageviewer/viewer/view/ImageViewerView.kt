@@ -48,6 +48,7 @@ import com.stfalcon.imageviewer.common.gestures.dismiss.SwipeToDismissHandler
 import com.stfalcon.imageviewer.common.pager.MultiTouchViewPager
 import com.stfalcon.imageviewer.loader.ImageLoader
 import com.stfalcon.imageviewer.viewer.adapter.ImagesPagerAdapter
+import com.stfalcon.imageviewer.viewer.builder.BuilderData
 
 internal class ImageViewerView<T> @JvmOverloads constructor(
     context: Context,
@@ -108,7 +109,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
     private var images: List<T> = listOf()
     private var imageLoader: ImageLoader<T>? = null
     private lateinit var transitionImageAnimator: TransitionImageAnimator
-    var scaleType: ImageView.ScaleType? = null
+    lateinit var builderData: BuilderData<T>
 
     private var startPosition: Int = 0
         set(value) {
@@ -360,6 +361,6 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
             externalImage = transitionImageView,
             internalImage = this.transitionImageView,
             internalImageContainer = this.transitionImageContainer,
-            scaleType = scaleType
+            scaleType = builderData.scaleType
         )
 }
