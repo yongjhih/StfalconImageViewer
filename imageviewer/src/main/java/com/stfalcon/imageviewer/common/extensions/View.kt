@@ -21,9 +21,12 @@ import android.animation.AnimatorListenerAdapter
 import android.animation.ObjectAnimator
 import android.graphics.Point
 import android.graphics.Rect
+import android.os.Build
 import android.view.View
 import android.view.ViewConfiguration
 import android.view.ViewGroup
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 
 internal val View?.localVisibleRect: Rect
     get() = Rect().also { this?.getLocalVisibleRect(it) }
@@ -126,3 +129,5 @@ internal fun View.switchVisibilityWithAnimation() {
     }
 }
 
+val View.rootWindowInsets: WindowInsetsCompat? get() =
+    ViewCompat.getRootWindowInsets(this)

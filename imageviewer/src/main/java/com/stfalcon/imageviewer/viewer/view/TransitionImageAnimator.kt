@@ -16,6 +16,7 @@
 
 package com.stfalcon.imageviewer.viewer.view
 
+import android.os.Build
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.*
