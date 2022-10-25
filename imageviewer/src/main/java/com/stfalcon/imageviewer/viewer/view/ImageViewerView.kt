@@ -343,16 +343,22 @@ class ImageViewerView<T> @JvmOverloads constructor(
 
     private fun createGestureDetector() =
         GestureDetectorCompat(context, SimpleOnGestureListener(
-            onSingleTap = {
+            onSingleTapConfirmed = {
                 if (imagesPager.isIdle) {
                     handleSingleTap(it, isOverlayWasClicked)
                 }
+                builderData?.onSingleTapConfirmed?.invoke(it)
                 false
             },
             onDoubleTap = {
                 wasDoubleTapped = !isScaled
+                builderData?.onDoubleTap?.invoke(it)
                 false
-            }
+            },
+            onLongPress = {
+                builderData?.onLongPress?.invoke(it)
+                false
+            },
         ))
 
     private fun createScaleGestureDetector() =

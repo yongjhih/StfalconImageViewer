@@ -17,6 +17,7 @@
 package com.stfalcon.imageviewer.viewer.builder
 
 import android.graphics.Color
+import android.view.MotionEvent
 import android.view.View
 import android.widget.ImageView
 import androidx.viewpager.widget.ViewPager
@@ -41,4 +42,8 @@ class BuilderData<T>(
     var transitionView: ImageView? = null
     var scaleType: ImageView.ScaleType? = null
     var onPageChangeListener: ViewPager.OnPageChangeListener? = null
+    var onSingleTapConfirmed: ((MotionEvent) -> Boolean) = { false }
+    var onSingleTap: ((MotionEvent) -> Boolean) = { false }
+    var onDoubleTap: ((MotionEvent) -> Boolean) = { false }
+    var onLongPress: ((MotionEvent) -> Unit) = {}
 }

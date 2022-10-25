@@ -19,14 +19,19 @@ package com.stfalcon.imageviewer.common.gestures.detector
 import android.view.GestureDetector
 import android.view.MotionEvent
 
-internal class SimpleOnGestureListener(
-    private val onSingleTap: ((MotionEvent) -> Boolean)? = null,
-    private val onDoubleTap: ((MotionEvent) -> Boolean)? = null
+class SimpleOnGestureListener(
+    private val onSingleTapConfirmed: ((MotionEvent) -> Boolean) = { false },
+    private val onSingleTap: ((MotionEvent) -> Boolean) = { false },
+    private val onDoubleTap: ((MotionEvent) -> Boolean) = { false },
+    private val onLongPress: ((MotionEvent) -> Unit) = {}
 ) : GestureDetector.SimpleOnGestureListener() {
-
     override fun onSingleTapConfirmed(event: MotionEvent): Boolean =
-        onSingleTap?.invoke(event) ?: false
+        onSingleTapConfirmed.invoke(event)
 
     override fun onDoubleTap(event: MotionEvent): Boolean =
-        onDoubleTap?.invoke(event) ?: false
+        onDoubleTap.invoke(event)
+
+    override fun onSingleTapUp(event: MotionEvent): Boolean = onSingleTap.invoke(event)
+
+    override fun onLongPress(event: MotionEvent) = onLongPress.invoke(event)
 }
