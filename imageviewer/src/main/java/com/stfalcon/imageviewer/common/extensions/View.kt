@@ -19,6 +19,7 @@ package com.stfalcon.imageviewer.common.extensions
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ObjectAnimator
+import android.graphics.Point
 import android.graphics.Rect
 import android.view.View
 import android.view.ViewConfiguration
@@ -27,14 +28,19 @@ import android.view.ViewGroup
 internal val View?.localVisibleRect: Rect
     get() = Rect().also { this?.getLocalVisibleRect(it) }
 
-internal val View?.globalVisibleRect: Rect
-    get() = Rect().also { this?.getGlobalVisibleRect(it) }
+internal val View.globalVisibleRect: Pair<Rect, Point>
+    get() {
+        val rect = Rect()
+        val point = Point()
+        getGlobalVisibleRect(rect, point)
+        return Pair(rect, point)
+    }
 
 internal val View?.hitRect: Rect
     get() = Rect().also { this?.getHitRect(it) }
 
 internal val View?.isRectVisible: Boolean
-    get() = this != null && globalVisibleRect != localVisibleRect
+    get() = this != null && globalVisibleRect.first != localVisibleRect
 
 internal val View?.isVisible: Boolean
     get() = this != null && visibility == View.VISIBLE

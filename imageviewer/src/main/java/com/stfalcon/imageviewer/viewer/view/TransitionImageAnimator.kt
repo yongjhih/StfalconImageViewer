@@ -27,7 +27,8 @@ import com.stfalcon.imageviewer.common.extensions.*
 internal class TransitionImageAnimator(
     private val externalImage: ImageView?,
     private val internalImage: ImageView,
-    private val internalImageContainer: FrameLayout
+    private val internalImageContainer: FrameLayout,
+    private val scaleType: ImageView.ScaleType? = null
 ) {
 
     companion object {
@@ -107,7 +108,7 @@ internal class TransitionImageAnimator(
         TransitionManager.beginDelayedTransition(
             internalRoot, createTransition { handleCloseTransitionEnd(onTransitionEnd) })
 
-        internalImage.scaleType = externalImage?.scaleType ?: ImageView.ScaleType.CENTER_CROP
+        internalImage.scaleType = scaleType ?: externalImage?.scaleType ?: ImageView.ScaleType.CENTER_CROP
         prepareTransitionLayout()
         internalImageContainer.requestLayout()
     }
@@ -120,8 +121,8 @@ internal class TransitionImageAnimator(
                     internalImage.applyMargin(top = -top, start = -left)
                 }
                 with(externalImage.globalVisibleRect) {
-                    internalImageContainer.requestNewSize(width(), height())
-                    internalImageContainer.applyMargin(left, top, right, bottom)
+                    internalImageContainer.requestNewSize(first.width(), first.height())
+                    internalImageContainer.applyMargin(first.left, first.top, first.right, first.bottom)
                 }
             }
 
@@ -151,7 +152,7 @@ internal class TransitionImageAnimator(
      *     .addListener(onTransitionEnd = { onTransitionEnd?.invoke() })
      * ```
      */
-    private fun createTransition(onTransitionEnd: (() -> Unit)? = null): Transition =
+    private fun createTransition(onTransitionEnd: ((Transition) -> Unit) = {}): Transition =
         TransitionSet().apply {
             ordering = TransitionSet.ORDERING_SEQUENTIAL
             addTransition(Fade(Fade.OUT)).apply {
@@ -164,7 +165,7 @@ internal class TransitionImageAnimator(
         }.
         setDuration(transitionDuration).
         setInterpolator(DecelerateInterpolator()).
-        addListener(onTransitionEnd = { onTransitionEnd?.invoke() })
+        addListener(onTransitionEnd = onTransitionEnd)
 }
 
 /*

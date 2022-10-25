@@ -108,6 +108,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
     private var images: List<T> = listOf()
     private var imageLoader: ImageLoader<T>? = null
     private lateinit var transitionImageAnimator: TransitionImageAnimator
+    var scaleType: ImageView.ScaleType? = null
 
     private var startPosition: Int = 0
         set(value) {
@@ -358,5 +359,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
         TransitionImageAnimator(
             externalImage = transitionImageView,
             internalImage = this.transitionImageView,
-            internalImageContainer = this.transitionImageContainer)
+            internalImageContainer = this.transitionImageContainer,
+            scaleType = scaleType
+        )
 }
