@@ -22,6 +22,8 @@ import android.view.View;
 import android.widget.ImageView;
 import androidx.annotation.*;
 import androidx.core.content.ContextCompat;
+import androidx.viewpager.widget.ViewPager;
+
 import com.stfalcon.imageviewer.listeners.OnDismissListener;
 import com.stfalcon.imageviewer.listeners.OnImageChangeListener;
 import com.stfalcon.imageviewer.loader.ImageLoader;
@@ -41,12 +43,15 @@ public class StfalconImageViewer<T> {
     @NonNull
     public final BuilderData<T> builderData;
     @NonNull
-    private final ImageViewerDialog<T> dialog;
+    public final ImageViewerDialog<T> dialog;
+    @NonNull
+    public final ViewPager viewPager;
 
     protected StfalconImageViewer(@NonNull Context context, @NonNull BuilderData<T> builderData) {
         this.context = context;
         this.builderData = builderData;
         this.dialog = new ImageViewerDialog<>(context, builderData);
+        this.viewPager = dialog.viewPager;
     }
 
     /**

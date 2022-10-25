@@ -20,11 +20,12 @@ import android.content.Context
 import android.view.KeyEvent
 import android.widget.ImageView
 import androidx.appcompat.app.AlertDialog
+import androidx.viewpager.widget.ViewPager
 import com.stfalcon.imageviewer.R
 import com.stfalcon.imageviewer.viewer.builder.BuilderData
 import com.stfalcon.imageviewer.viewer.view.ImageViewerView
 
-internal class ImageViewerDialog<T>(
+class ImageViewerDialog<T>(
     context: Context,
     private val builderData: BuilderData<T>
 ) {
@@ -32,6 +33,8 @@ internal class ImageViewerDialog<T>(
     private val dialog: AlertDialog
     private val viewerView: ImageViewerView<T> = ImageViewerView(context)
     private var animateOpen = true
+    @JvmField
+    val viewPager: ViewPager = viewerView.imagesPager
 
     private val dialogStyle: Int
         get() = if (builderData.shouldStatusBarHide)

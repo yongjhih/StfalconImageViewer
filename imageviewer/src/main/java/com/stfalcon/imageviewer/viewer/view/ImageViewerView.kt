@@ -51,7 +51,7 @@ import com.stfalcon.imageviewer.loader.ImageLoader
 import com.stfalcon.imageviewer.viewer.adapter.ImagesPagerAdapter
 import com.stfalcon.imageviewer.viewer.builder.BuilderData
 
-internal class ImageViewerView<T> @JvmOverloads constructor(
+class ImageViewerView<T> @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
@@ -68,8 +68,6 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
 
     internal var onDismiss: (() -> Unit)? = null
     internal var onPageChange: ((position: Int) -> Unit)? = null
-
-    internal var onPageChangeListener: ViewPager.OnPageChangeListener? = null
 
     internal val isScaled
         get() = imagesAdapter?.isScaled(currentPosition) ?: false
@@ -96,7 +94,7 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
     private val transitionImageView: ImageView
     private var externalTransitionImageView: ImageView? = null
 
-    private var imagesPager: MultiTouchViewPager
+    var imagesPager: MultiTouchViewPager
     private var imagesAdapter: ImagesPagerAdapter<T>? = null
 
     private var directionDetector: SwipeDirectionDetector
