@@ -75,6 +75,13 @@ internal class TransitionImageAnimator(
 
     private fun doOpenTransition(containerPadding: IntArray, onTransitionEnd: () -> Unit) {
         isAnimating = true
+        /**
+         * For a landscape image in a square center-crop imageView
+         *
+         * If we don't make it with same scale-type,
+         * the transition starts with inappropriate non-fulfill landscape shape from a fulfill center-crop ImageView
+         */
+        internalImage.scaleType = scaleType ?: externalImage?.scaleType ?: ImageView.ScaleType.CENTER_CROP
         prepareTransitionLayout()
 
         internalRoot.postApply {
@@ -97,6 +104,11 @@ internal class TransitionImageAnimator(
                 containerPadding[2],
                 containerPadding[3])
 
+            /**
+             * Since the transition may start with non fit-center scaleType,
+             * we should make it back to fit-center as target scaleType
+             */
+            internalImage.scaleType = ImageView.ScaleType.FIT_CENTER
             internalImageContainer.requestLayout()
         }
     }
@@ -108,6 +120,12 @@ internal class TransitionImageAnimator(
         TransitionManager.beginDelayedTransition(
             internalRoot, createTransition { handleCloseTransitionEnd(onTransitionEnd) })
 
+        /**
+         * For a landscape image in a square center-crop imageView
+         *
+         * If we don't make it with same scale-type,
+         * the transition starts with inappropriate non-fulfill landscape shape from a fulfill center-crop ImageView
+         */
         internalImage.scaleType = scaleType ?: externalImage?.scaleType ?: ImageView.ScaleType.CENTER_CROP
         prepareTransitionLayout()
         internalImageContainer.requestLayout()
