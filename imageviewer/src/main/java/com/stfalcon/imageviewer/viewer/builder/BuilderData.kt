@@ -17,10 +17,12 @@
 package com.stfalcon.imageviewer.viewer.builder
 
 import android.graphics.Color
+import android.view.MotionEvent
 import android.view.View
 import android.widget.ImageView
 import androidx.annotation.StyleRes
 import androidx.transition.Transition
+import androidx.viewpager.widget.ViewPager
 import com.stfalcon.imageviewer.listeners.OnDismissListener
 import com.stfalcon.imageviewer.listeners.OnImageChangeListener
 import com.stfalcon.imageviewer.loader.ImageLoader
@@ -46,4 +48,9 @@ class BuilderData<T>(
     @StyleRes
     var style: Int? = null
     var onTransition: ((Boolean) -> Transition)? = null
+    var onPageChangeListener: ViewPager.OnPageChangeListener? = null
+    var onSingleTapConfirmed: ((MotionEvent) -> Boolean)? = null
+    var onSingleTap: ((MotionEvent) -> Boolean)? = null
+    var onDoubleTap: ((MotionEvent) -> Boolean)? = null
+    var onLongPress: ((MotionEvent) -> Unit)? = null
 }

@@ -20,7 +20,7 @@ class ScrollingImagesDemoActivity : AppCompatActivity() {
         listOf(
             scrollingHorizontalFirstImage,
             scrollingHorizontalSecondImage,
-            scrollingHorizontalThirdImage,
+            scrollingVerticalThirdImage,
             scrollingHorizontalFourthImage)
     }
 
@@ -28,7 +28,7 @@ class ScrollingImagesDemoActivity : AppCompatActivity() {
         listOf(
             scrollingVerticalFirstImage,
             scrollingVerticalSecondImage,
-            scrollingVerticalThirdImage,
+            scrollingHorizontalThirdImage,
             scrollingVerticalFourthImage)
     }
 
@@ -73,7 +73,8 @@ class ScrollingImagesDemoActivity : AppCompatActivity() {
                             ordering = TransitionSet.ORDERING_TOGETHER
                             addTransition(ChangeBounds())
                             addTransition(ChangeImageTransform())
-                        }.addTransition(Fade(Fade.IN))
+                        }
+                        addTransition(Fade(Fade.IN))
                     }
                 }
             }

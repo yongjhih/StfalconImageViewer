@@ -36,8 +36,11 @@ import java.util.List;
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class StfalconImageViewer<T> {
 
+    @NonNull
     private final Context context;
+    @NonNull
     public final BuilderData<T> builderData;
+    @NonNull
     private final ImageViewerDialog<T> dialog;
 
     protected StfalconImageViewer(@NonNull Context context, @NonNull BuilderData<T> builderData) {
@@ -120,14 +123,20 @@ public class StfalconImageViewer<T> {
      */
     public static class Builder<T> {
 
+        @NonNull
         private final Context context;
+        @NonNull
         public final BuilderData<T> data;
 
-        public Builder(Context context, T[] images, ImageLoader<T> imageLoader) {
+        public Builder(
+                @NonNull
+                Context context, T[] images, ImageLoader<T> imageLoader) {
             this(context, new ArrayList<>(Arrays.asList(images)), imageLoader);
         }
 
-        public Builder(Context context, List<T> images, ImageLoader<T> imageLoader) {
+        public Builder(
+                @NonNull
+                Context context, List<T> images, ImageLoader<T> imageLoader) {
             this.context = context;
             this.data = new BuilderData<>(images, imageLoader);
         }

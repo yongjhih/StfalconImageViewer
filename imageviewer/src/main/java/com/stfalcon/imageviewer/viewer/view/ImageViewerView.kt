@@ -149,6 +149,16 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
         scaleDetector = createScaleGestureDetector()
     }
 
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        data.onPageChangeListener?.let { imagesPager.addOnPageChangeListener(it) }
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        data.onPageChangeListener?.let { imagesPager.removeOnPageChangeListener(it) }
+    }
+
     override fun dispatchTouchEvent(event: MotionEvent): Boolean {
         if (overlayView.isVisible && overlayView?.dispatchTouchEvent(event) == true) {
             return true
@@ -334,15 +344,21 @@ internal class ImageViewerView<T> @JvmOverloads constructor(
 
     private fun createGestureDetector() =
         GestureDetectorCompat(context, SimpleOnGestureListener(
-            onSingleTap = {
+            onSingleTapConfirmed = {
                 if (imagesPager.isIdle) {
                     handleSingleTap(it, isOverlayWasClicked)
                 }
-                false
+                data.onSingleTapConfirmed?.invoke(it) ?: false
             },
             onDoubleTap = {
                 wasDoubleTapped = !isScaled
-                false
+                data.onDoubleTap?.invoke(it) ?: false
+            },
+            onSingleTap = {
+                data.onSingleTap?.invoke(it) ?: false
+            },
+            onLongPress = {
+                data.onLongPress?.invoke(it)
             }
         ))
 

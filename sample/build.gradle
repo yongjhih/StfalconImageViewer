@@ -29,6 +29,7 @@ dependencies {
     implementation 'androidx.transition:transition:1.2.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.0-beta3'
     implementation 'androidx.coordinatorlayout:coordinatorlayout:1.1.0-rc01'
+    implementation 'com.github.chrisbanes:PhotoView:2.2.0'
 
     //UI
     implementation 'com.squareup.picasso:picasso:2.71828'
