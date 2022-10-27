@@ -132,7 +132,8 @@ internal class TransitionImageAnimator(
          * If we don't make it with same scale-type,
          * the transition starts with inappropriate non-fulfill landscape shape from a fulfill center-crop ImageView
          */
-        internalImage.scaleType = scaleType ?: externalImage?.scaleType ?: ImageView.ScaleType.CENTER_CROP
+        //internalImage.scaleType = scaleType ?: externalImage?.scaleType ?: ImageView.ScaleType.CENTER_CROP
+        scaleType?.let { internalImage.scaleType = it }
         prepareTransitionLayout()
         internalImageContainer.requestLayout()
     }
