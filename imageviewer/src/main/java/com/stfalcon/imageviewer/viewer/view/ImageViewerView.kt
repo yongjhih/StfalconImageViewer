@@ -376,6 +376,8 @@ class ImageViewerView<T> @JvmOverloads constructor(
             externalImage = transitionImageView,
             internalImage = this.transitionImageView,
             internalImageContainer = this.transitionImageContainer,
-            scaleType = builderData?.scaleType
+            scaleType = builderData?.scaleType,
+            onOpenBeforeScaleType = builderData?.onOpenBeforeScaleType,
+            onOpenAfterScaleType = builderData?.onOpenAfterScaleType,
         )
 }

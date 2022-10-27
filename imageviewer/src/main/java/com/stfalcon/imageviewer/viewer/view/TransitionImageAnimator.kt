@@ -31,6 +31,8 @@ internal class TransitionImageAnimator(
     private val internalImageContainer: FrameLayout,
     private val scaleType: ImageView.ScaleType? = null,
     private val onTransition: () -> Transition? = { null },
+    private val onOpenBeforeScaleType: ImageView.ScaleType? = null,
+    private val onOpenAfterScaleType: ImageView.ScaleType? = null,
 ) {
 
     companion object {
@@ -83,7 +85,8 @@ internal class TransitionImageAnimator(
          * If we don't make it with same scale-type,
          * the transition starts with inappropriate non-fulfill landscape shape from a fulfill center-crop ImageView
          */
-        internalImage.scaleType = scaleType ?: externalImage?.scaleType ?: ImageView.ScaleType.CENTER_CROP
+        //internalImage.scaleType = scaleType ?: externalImage?.scaleType ?: ImageView.ScaleType.CENTER_CROP
+        onOpenBeforeScaleType?.let { internalImage.scaleType = it }
         prepareTransitionLayout()
 
         internalRoot.postApply {
@@ -110,7 +113,8 @@ internal class TransitionImageAnimator(
              * Since the transition may start with non fit-center scaleType,
              * we should make it back to fit-center as target scaleType
              */
-            internalImage.scaleType = ImageView.ScaleType.FIT_CENTER
+            //internalImage.scaleType = ImageView.ScaleType.FIT_CENTER
+            onOpenAfterScaleType?.let { internalImage.scaleType = it }
             internalImageContainer.requestLayout()
         }
     }

@@ -45,6 +45,8 @@ class BuilderData<T>(
     var isSwipeToDismissAllowed = true
     var transitionView: ImageView? = null
     var scaleType: ImageView.ScaleType? = null
+    val onOpenBeforeScaleType: ImageView.ScaleType? = null
+    val onOpenAfterScaleType: ImageView.ScaleType? = null
     var onPageChangeListener: ViewPager.OnPageChangeListener? = null
     var onSingleTapConfirmed: ((MotionEvent) -> Boolean) = { false }
     var onSingleTap: ((MotionEvent) -> Boolean) = { false }
