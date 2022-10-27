@@ -1,5 +1,6 @@
 package com.stfalcon.sample.features.demo.scroll
 
+import android.graphics.Rect
 import android.os.Bundle
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
@@ -56,13 +57,13 @@ class ScrollingImagesDemoActivity : AppCompatActivity() {
         images: List<String>,
         imageViews: List<ImageView>) {
         viewer = StfalconImageViewer.Builder<String>(this, images, ::loadImage)
-            .withHiddenStatusBar(false)
             .withStartPosition(startPosition)
             .withTransitionFrom(target)
             .apply {
                 data.onScaleType = { it?.scaleType }
                 data.onOpenBeforeScaleType = { it?.scaleType }
                 data.onOpenAfterScaleType = { ImageView.ScaleType.FIT_CENTER }
+                //data.offset = Rect(0, -120, 0,  0)
                 data.onTransition = {
                     TransitionSet().apply {
                         ordering = TransitionSet.ORDERING_SEQUENTIAL

@@ -22,6 +22,7 @@ import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
 import android.widget.FrameLayout
 import android.widget.ImageView
+import androidx.core.view.ViewCompat
 import androidx.transition.AutoTransition
 import androidx.transition.Transition
 import androidx.transition.TransitionManager
@@ -126,15 +127,18 @@ internal class TransitionImageAnimator(
             Log.v("ImageViewer", "externalImage.size: ${externalImage.width}, ${externalImage.height}")
             Log.v("ImageViewer", "externalImage.localVisibleRect: ${localVisibleRect}, ${localVisibleRect}")
             Log.v("ImageViewer", "externalImage.globalVisibleRect: ${globalVisibleRect}, ${globalVisibleRect}")
+            val insetsRect = ViewCompat.getRootWindowInsets(externalImage)?.stableInsets?.toRect().orEmpty()
+            Log.v("ImageViewer", "externalImage.stableInsets: ${insetsRect}")
+            val offset = data.offset.orEmpty()
+
             if (isRectVisible) {
                 localVisibleRect.run {
                     internalImage.requestNewSize(externalImage.width, externalImage.height)
                     internalImage.applyMargin(
-                        top = -top + (data.offset?.top ?: 0), start = -left + (data.offset?.left ?: 0), end = data.offset?.right ?: 0, bottom = data.offset?.bottom ?: 0)
+                        top = -top + offset.top, start = -left + offset.left)
                 }
                 globalVisibleRect.run {
                     internalImageContainer.requestNewSize(width(), height())
-                    //internalImageContainer.applyMargin(left + (data.offset?.top ?: 0), top + (data.offset?.top ?: 0), right + (data.offset?.top ?: 0), bottom + (data.offset?.top ?: 0))
                     internalImageContainer.applyMargin(left, top, right, bottom)
                 }
             }
