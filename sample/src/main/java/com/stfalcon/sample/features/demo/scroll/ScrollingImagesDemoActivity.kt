@@ -3,10 +3,7 @@ package com.stfalcon.sample.features.demo.scroll
 import android.os.Bundle
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.transition.ChangeBounds
-import androidx.transition.ChangeImageTransform
-import androidx.transition.Fade
-import androidx.transition.TransitionSet
+import androidx.transition.*
 import com.stfalcon.imageviewer.StfalconImageViewer
 import com.stfalcon.sample.R
 import com.stfalcon.sample.common.extensions.getDrawableCompat
@@ -69,11 +66,14 @@ class ScrollingImagesDemoActivity : AppCompatActivity() {
                 data.onTransition = {
                     TransitionSet().apply {
                         ordering = TransitionSet.ORDERING_SEQUENTIAL
-                        addTransition(Fade(Fade.OUT)).apply {
+                        addTransition(Fade(Fade.OUT))
+                        addTransition(TransitionSet().apply {
                             ordering = TransitionSet.ORDERING_TOGETHER
+                            //addTransition(ChangeTransform())
                             addTransition(ChangeBounds())
+                            //addTransition(ChangeClipBounds())
                             addTransition(ChangeImageTransform())
-                        }
+                        })
                         addTransition(Fade(Fade.IN))
                     }
                 }

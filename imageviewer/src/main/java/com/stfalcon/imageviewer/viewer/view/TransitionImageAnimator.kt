@@ -16,6 +16,7 @@
 
 package com.stfalcon.imageviewer.viewer.view
 
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
@@ -79,7 +80,6 @@ internal class TransitionImageAnimator(
     private fun doOpenTransition(containerPadding: IntArray, onTransitionEnd: () -> Unit) {
         isAnimating = true
         prepareTransitionLayout()
-
         data.onOpenBeforeScaleType?.invoke(externalImage)?.let { internalImage.scaleType = it }
         internalRoot.postApply {
             data.onOpenAfterScaleType?.invoke(externalImage)?.let { internalImage.scaleType = it }
@@ -119,13 +119,19 @@ internal class TransitionImageAnimator(
     }
 
     private fun prepareTransitionLayout() {
-        externalImage?.let {
-            if (externalImage.isRectVisible) {
-                with(externalImage.localVisibleRect) {
-                    internalImage.requestNewSize(it.width, it.height)
+        externalImage?.let { externalImage ->
+            val localVisibleRect = externalImage.localVisibleRect
+            val globalVisibleRect = externalImage.globalVisibleRect
+            val isRectVisible = localVisibleRect != globalVisibleRect
+            Log.v("ImageViewer", "externalImage.size: ${externalImage.width}, ${externalImage.height}")
+            Log.v("ImageViewer", "externalImage.localVisibleRect: ${localVisibleRect}, ${localVisibleRect}")
+            Log.v("ImageViewer", "externalImage.globalVisibleRect: ${globalVisibleRect}, ${globalVisibleRect}")
+            if (isRectVisible) {
+                localVisibleRect.run {
+                    internalImage.requestNewSize(externalImage.width, externalImage.height)
                     internalImage.applyMargin(top = -top, start = -left)
                 }
-                with(externalImage.globalVisibleRect) {
+                globalVisibleRect.run {
                     internalImageContainer.requestNewSize(width(), height())
                     internalImageContainer.applyMargin(left, top, right, bottom)
                 }
