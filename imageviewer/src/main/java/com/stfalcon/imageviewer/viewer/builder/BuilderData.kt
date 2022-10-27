@@ -17,6 +17,7 @@
 package com.stfalcon.imageviewer.viewer.builder
 
 import android.graphics.Color
+import android.graphics.Rect
 import android.view.MotionEvent
 import android.view.View
 import android.widget.ImageView
@@ -53,4 +54,5 @@ class BuilderData<T>(
     var onSingleTap: ((MotionEvent) -> Boolean)? = null
     var onDoubleTap: ((MotionEvent) -> Boolean)? = null
     var onLongPress: ((MotionEvent) -> Unit)? = null
+    var offset: Rect? = null
 }

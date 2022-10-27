@@ -129,10 +129,12 @@ internal class TransitionImageAnimator(
             if (isRectVisible) {
                 localVisibleRect.run {
                     internalImage.requestNewSize(externalImage.width, externalImage.height)
-                    internalImage.applyMargin(top = -top, start = -left)
+                    internalImage.applyMargin(
+                        top = -top + (data.offset?.top ?: 0), start = -left + (data.offset?.left ?: 0), end = data.offset?.right ?: 0, bottom = data.offset?.bottom ?: 0)
                 }
                 globalVisibleRect.run {
                     internalImageContainer.requestNewSize(width(), height())
+                    //internalImageContainer.applyMargin(left + (data.offset?.top ?: 0), top + (data.offset?.top ?: 0), right + (data.offset?.top ?: 0), bottom + (data.offset?.top ?: 0))
                     internalImageContainer.applyMargin(left, top, right, bottom)
                 }
             }
