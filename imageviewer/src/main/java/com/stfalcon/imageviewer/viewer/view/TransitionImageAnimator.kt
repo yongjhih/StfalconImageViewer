@@ -29,7 +29,8 @@ internal class TransitionImageAnimator(
     private val externalImage: ImageView?,
     private val internalImage: ImageView,
     private val internalImageContainer: FrameLayout,
-    private val scaleType: ImageView.ScaleType? = null
+    private val scaleType: ImageView.ScaleType? = null,
+    private val onTransition: () -> Transition? = { null },
 ) {
 
     companion object {
@@ -170,20 +171,27 @@ internal class TransitionImageAnimator(
      *     .setInterpolator(DecelerateInterpolator())
      *     .addListener(onTransitionEnd = { onTransitionEnd?.invoke() })
      * ```
+     * ```
+     * AutoTransition()
+     *     .setDuration(transitionDuration)
+     *     .setInterpolator(DecelerateInterpolator())
+     *     .addListener(onTransitionEnd = onTransitionEnd)
+     * ```
      */
     private fun createTransition(onTransitionEnd: ((Transition) -> Unit) = {}): Transition =
-        TransitionSet().apply {
+        (onTransition() ?: TransitionSet().apply {
             ordering = TransitionSet.ORDERING_SEQUENTIAL
             addTransition(Fade(Fade.OUT)).apply {
                 ordering = TransitionSet.ORDERING_TOGETHER
-                //addTransition(ChangeClipBounds())
+                //addTransition(ChangeBounds())
                 //addTransition(ChangeTransform())
                 addTransition(ChangeBounds())
-                addTransition(ChangeImageTransform())
-            }.addTransition(Fade(Fade.IN))
+            }
+                .addTransition(ChangeImageTransform())
+                .addTransition(Fade(Fade.IN))
         }.
         setDuration(transitionDuration).
-        setInterpolator(DecelerateInterpolator()).
+        setInterpolator(DecelerateInterpolator())).
         addListener(onTransitionEnd = onTransitionEnd)
 }
 

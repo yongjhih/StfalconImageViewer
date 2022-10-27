@@ -21,6 +21,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.widget.ImageView
 import androidx.annotation.StyleRes
+import androidx.transition.Transition
 import androidx.viewpager.widget.ViewPager
 import com.stfalcon.imageviewer.listeners.OnDismissListener
 import com.stfalcon.imageviewer.listeners.OnImageChangeListener
@@ -49,4 +50,5 @@ class BuilderData<T>(
     var onSingleTap: ((MotionEvent) -> Boolean) = { false }
     var onDoubleTap: ((MotionEvent) -> Boolean) = { false }
     var onLongPress: ((MotionEvent) -> Unit) = {}
+    var onTransition: () -> Transition? = { null }
 }
