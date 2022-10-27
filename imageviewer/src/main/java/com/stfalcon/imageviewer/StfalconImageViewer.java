@@ -129,7 +129,7 @@ public class StfalconImageViewer<T> {
     public static class Builder<T> {
 
         private final Context context;
-        private final BuilderData<T> data;
+        public final BuilderData<T> data;
 
         public Builder(Context context, T[] images, ImageLoader<T> imageLoader) {
             this(context, new ArrayList<>(Arrays.asList(images)), imageLoader);
