@@ -34,7 +34,7 @@ internal class ImageViewerDialog<T>(
     private var animateOpen = true
 
     private val dialogStyle: Int
-        get() = if (builderData.shouldStatusBarHide)
+        get() = builderData.style ?: if (builderData.shouldStatusBarHide)
             R.style.ImageViewerDialog_NoStatusBar
         else
             R.style.ImageViewerDialog_Default
@@ -110,6 +110,7 @@ internal class ImageViewerDialog<T>(
 
             onPageChange = { position -> builderData.imageChangeListener?.onImageChange(position) }
             onDismiss = { dialog.dismiss() }
+            data = builderData
         }
     }
 }

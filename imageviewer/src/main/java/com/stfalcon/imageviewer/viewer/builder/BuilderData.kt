@@ -19,11 +19,13 @@ package com.stfalcon.imageviewer.viewer.builder
 import android.graphics.Color
 import android.view.View
 import android.widget.ImageView
+import androidx.annotation.StyleRes
+import androidx.transition.Transition
 import com.stfalcon.imageviewer.listeners.OnDismissListener
 import com.stfalcon.imageviewer.listeners.OnImageChangeListener
 import com.stfalcon.imageviewer.loader.ImageLoader
 
-internal class BuilderData<T>(
+class BuilderData<T>(
     val images: List<T>,
     val imageLoader: ImageLoader<T>
 ) {
@@ -38,4 +40,10 @@ internal class BuilderData<T>(
     var isZoomingAllowed = true
     var isSwipeToDismissAllowed = true
     var transitionView: ImageView? = null
+    var onScaleType: ((ImageView?) -> ImageView.ScaleType?)? = null
+    var onOpenBeforeScaleType: ((ImageView?) -> ImageView.ScaleType?)? = null
+    var onOpenAfterScaleType: ((ImageView?) -> ImageView.ScaleType?)? = null
+    @StyleRes
+    var style: Int? = null
+    var onTransition: ((Boolean) -> Transition)? = null
 }

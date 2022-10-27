@@ -25,11 +25,13 @@ import androidx.transition.AutoTransition
 import androidx.transition.Transition
 import androidx.transition.TransitionManager
 import com.stfalcon.imageviewer.common.extensions.*
+import com.stfalcon.imageviewer.viewer.builder.BuilderData
 
 internal class TransitionImageAnimator(
     private val externalImage: ImageView?,
     private val internalImage: ImageView,
-    private val internalImageContainer: FrameLayout
+    private val internalImageContainer: FrameLayout,
+    private val data: BuilderData<*>
 ) {
 
     companion object {
@@ -78,7 +80,9 @@ internal class TransitionImageAnimator(
         isAnimating = true
         prepareTransitionLayout()
 
+        data.onOpenBeforeScaleType?.invoke(externalImage)?.let { internalImage.scaleType = it }
         internalRoot.postApply {
+            data.onOpenAfterScaleType?.invoke(externalImage)?.let { internalImage.scaleType = it }
             //ain't nothing but a kludge to prevent blinking when transition is starting
             externalImage?.postDelayed(50) { visibility = View.INVISIBLE }
 
@@ -109,6 +113,7 @@ internal class TransitionImageAnimator(
         TransitionManager.beginDelayedTransition(
             internalRoot, createTransition { handleCloseTransitionEnd(onTransitionEnd) })
 
+        data.onScaleType?.invoke(externalImage)?.let { internalImage.scaleType = it }
         prepareTransitionLayout()
         internalImageContainer.requestLayout()
     }
@@ -145,8 +150,8 @@ internal class TransitionImageAnimator(
     }
 
     private fun createTransition(onTransitionEnd: (() -> Unit)? = null): Transition =
-        AutoTransition()
+        (data.onTransition?.invoke(isClosing) ?: AutoTransition()
             .setDuration(transitionDuration)
-            .setInterpolator(DecelerateInterpolator())
+            .setInterpolator(DecelerateInterpolator()))
             .addListener(onTransitionEnd = { onTransitionEnd?.invoke() })
 }

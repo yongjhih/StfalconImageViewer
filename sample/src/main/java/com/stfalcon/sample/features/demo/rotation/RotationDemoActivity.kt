@@ -36,12 +36,10 @@ class RotationDemoActivity : AppCompatActivity() {
         viewer.dismiss()
     }
 
-    override fun onRestoreInstanceState(savedInstanceState: Bundle?) {
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
-        if (savedInstanceState != null) {
-            isDialogShown = savedInstanceState.getBoolean(KEY_IS_DIALOG_SHOWN)
-            currentPosition = savedInstanceState.getInt(KEY_CURRENT_POSITION)
-        }
+        isDialogShown = savedInstanceState.getBoolean(KEY_IS_DIALOG_SHOWN)
+        currentPosition = savedInstanceState.getInt(KEY_CURRENT_POSITION)
 
         if (isDialogShown) {
             openViewer(currentPosition)
@@ -56,6 +54,7 @@ class RotationDemoActivity : AppCompatActivity() {
 
     private fun openViewer(startPosition: Int) {
         viewer = StfalconImageViewer.Builder<Poster>(this, Demo.posters, ::loadPosterImage)
+            .withHiddenStatusBar(false)
             .withTransitionFrom(getTransitionTarget(startPosition))
             .withStartPosition(startPosition)
             .withImageChangeListener {

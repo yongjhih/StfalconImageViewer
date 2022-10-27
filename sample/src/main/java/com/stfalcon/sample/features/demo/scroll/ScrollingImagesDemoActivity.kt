@@ -3,6 +3,10 @@ package com.stfalcon.sample.features.demo.scroll
 import android.os.Bundle
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.transition.ChangeBounds
+import androidx.transition.ChangeImageTransform
+import androidx.transition.Fade
+import androidx.transition.TransitionSet
 import com.stfalcon.imageviewer.StfalconImageViewer
 import com.stfalcon.sample.R
 import com.stfalcon.sample.common.extensions.getDrawableCompat
@@ -55,8 +59,24 @@ class ScrollingImagesDemoActivity : AppCompatActivity() {
         images: List<String>,
         imageViews: List<ImageView>) {
         viewer = StfalconImageViewer.Builder<String>(this, images, ::loadImage)
+            .withHiddenStatusBar(false)
             .withStartPosition(startPosition)
             .withTransitionFrom(target)
+            .apply {
+                data.onScaleType = { it?.scaleType }
+                data.onOpenBeforeScaleType = { it?.scaleType }
+                data.onOpenAfterScaleType = { ImageView.ScaleType.FIT_CENTER }
+                data.onTransition = {
+                    TransitionSet().apply {
+                        ordering = TransitionSet.ORDERING_SEQUENTIAL
+                        addTransition(Fade(Fade.OUT)).apply {
+                            ordering = TransitionSet.ORDERING_TOGETHER
+                            addTransition(ChangeBounds())
+                            addTransition(ChangeImageTransform())
+                        }.addTransition(Fade(Fade.IN))
+                    }
+                }
+            }
             .withImageChangeListener { viewer.updateTransitionImage(imageViews.getOrNull(it)) }
             .show()
     }
