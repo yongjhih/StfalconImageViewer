@@ -125,8 +125,8 @@ internal class TransitionImageAnimator(
             val globalVisibleRect = externalImage.globalVisibleRect
             val isRectVisible = localVisibleRect != globalVisibleRect
             Log.v("ImageViewer", "externalImage.size: ${externalImage.width}, ${externalImage.height}")
-            Log.v("ImageViewer", "externalImage.localVisibleRect: ${localVisibleRect}, ${localVisibleRect}")
-            Log.v("ImageViewer", "externalImage.globalVisibleRect: ${globalVisibleRect}, ${globalVisibleRect}")
+            Log.v("ImageViewer", "externalImage.localVisibleRect: ${localVisibleRect}")
+            Log.v("ImageViewer", "externalImage.globalVisibleRect: ${globalVisibleRect}")
             val insetsRect = ViewCompat.getRootWindowInsets(externalImage)?.stableInsets?.toRect().orEmpty()
             Log.v("ImageViewer", "externalImage.stableInsets: ${insetsRect}")
             val offset = data.offset.orEmpty()
@@ -139,7 +139,7 @@ internal class TransitionImageAnimator(
                 }
                 globalVisibleRect.run {
                     internalImageContainer.requestNewSize(width(), height())
-                    internalImageContainer.applyMargin(left, top, right, bottom)
+                    internalImageContainer.applyMargin(left, top)
                 }
             }
 
