@@ -80,8 +80,8 @@ internal class TransitionImageAnimator(
 
     private fun doOpenTransition(containerPadding: IntArray, onTransitionEnd: () -> Unit) {
         isAnimating = true
-        prepareTransitionLayout()
         data.onOpenBeforeScaleType?.invoke(externalImage)?.let { internalImage.scaleType = it }
+        prepareTransitionLayout()
         internalRoot.postApply {
             data.onOpenAfterScaleType?.invoke(externalImage)?.let { internalImage.scaleType = it }
             //ain't nothing but a kludge to prevent blinking when transition is starting
