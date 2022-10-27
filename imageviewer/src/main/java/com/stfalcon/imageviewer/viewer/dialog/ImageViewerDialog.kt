@@ -19,6 +19,7 @@ package com.stfalcon.imageviewer.viewer.dialog
 import android.content.Context
 import android.view.KeyEvent
 import android.widget.ImageView
+import androidx.annotation.StyleRes
 import androidx.appcompat.app.AlertDialog
 import androidx.viewpager.widget.ViewPager
 import com.stfalcon.imageviewer.R
@@ -36,8 +37,9 @@ class ImageViewerDialog<T>(
     @JvmField
     val viewPager: ViewPager = viewerView.imagesPager
 
-    private val dialogStyle: Int
-        get() = if (builderData.shouldStatusBarHide)
+    @StyleRes
+    private fun dialogStyle(): Int =
+        builderData.style ?: if (builderData.shouldStatusBarHide)
             R.style.ImageViewerDialog_NoStatusBar
         else
             R.style.ImageViewerDialog_Default
@@ -45,7 +47,7 @@ class ImageViewerDialog<T>(
     init {
         setupViewerView()
         dialog = AlertDialog
-            .Builder(context, dialogStyle)
+            .Builder(context, dialogStyle())
             .setView(viewerView)
             .setOnKeyListener { _, keyCode, event -> onDialogKeyEvent(keyCode, event) }
             .create()

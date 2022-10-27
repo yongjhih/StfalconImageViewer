@@ -25,7 +25,7 @@ import androidx.transition.*
 import com.stfalcon.imageviewer.common.extensions.*
 import kotlin.math.max
 
-internal class OldTransitionImageAnimator(
+internal class TransitionImageAnimator(
     private val externalImage: ImageView?,
     private val internalImage: ImageView,
     private val internalImageContainer: FrameLayout,
@@ -187,7 +187,7 @@ internal class OldTransitionImageAnimator(
         addListener(onTransitionEnd = onTransitionEnd)
 }
 
-internal class TransitionImageAnimator(
+internal class NewTransitionImageAnimator(
     private val externalImage: ImageView?,
     private val internalImage: ImageView,
     private val internalImageContainer: FrameLayout,

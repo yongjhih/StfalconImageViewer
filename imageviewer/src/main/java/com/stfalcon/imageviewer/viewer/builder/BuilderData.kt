@@ -20,6 +20,7 @@ import android.graphics.Color
 import android.view.MotionEvent
 import android.view.View
 import android.widget.ImageView
+import androidx.annotation.StyleRes
 import androidx.viewpager.widget.ViewPager
 import com.stfalcon.imageviewer.listeners.OnDismissListener
 import com.stfalcon.imageviewer.listeners.OnImageChangeListener
@@ -37,6 +38,8 @@ class BuilderData<T>(
     var imageMarginPixels: Int = 0
     var containerPaddingPixels = IntArray(4)
     var shouldStatusBarHide = true
+    @StyleRes
+    var style: Int? = null
     var isZoomingAllowed = true
     var isSwipeToDismissAllowed = true
     var transitionView: ImageView? = null
