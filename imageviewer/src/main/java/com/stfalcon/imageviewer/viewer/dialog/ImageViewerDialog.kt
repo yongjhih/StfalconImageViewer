@@ -24,13 +24,14 @@ import com.stfalcon.imageviewer.R
 import com.stfalcon.imageviewer.viewer.builder.BuilderData
 import com.stfalcon.imageviewer.viewer.view.ImageViewerView
 
-internal class ImageViewerDialog<T>(
+class ImageViewerDialog<T>(
     context: Context,
     private val builderData: BuilderData<T>
 ) {
 
     private val dialog: AlertDialog
-    private val viewerView: ImageViewerView<T> = ImageViewerView(context)
+    @JvmField
+    val viewerView: ImageViewerView<T> = ImageViewerView(context)
     private var animateOpen = true
 
     private val dialogStyle: Int
