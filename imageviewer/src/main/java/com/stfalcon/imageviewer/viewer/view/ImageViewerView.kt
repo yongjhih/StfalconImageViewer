@@ -49,6 +49,7 @@ import com.stfalcon.imageviewer.common.pager.MultiTouchViewPager
 import com.stfalcon.imageviewer.loader.ImageLoader
 import com.stfalcon.imageviewer.viewer.adapter.ImagesPagerAdapter
 import com.stfalcon.imageviewer.viewer.builder.BuilderData
+import timber.log.Timber
 
 class ImageViewerView<T> @JvmOverloads constructor(
     context: Context,
@@ -99,7 +100,7 @@ class ImageViewerView<T> @JvmOverloads constructor(
     private var directionDetector: SwipeDirectionDetector
     private var gestureDetector: GestureDetectorCompat
     private var scaleDetector: ScaleGestureDetector
-    private lateinit var swipeDismissHandler: SwipeToDismissHandler
+    private var swipeDismissHandler: SwipeToDismissHandler? = null
 
     private var wasScaled: Boolean = false
     private var wasDoubleTapped = false
@@ -206,7 +207,8 @@ class ImageViewerView<T> @JvmOverloads constructor(
         this.transitionImageView.copyBitmapFrom(transitionImageView)
 
         transitionImageAnimator = createTransitionImageAnimator(transitionImageView)
-        swipeDismissHandler = createSwipeToDismissHandler()
+        val swipeDismissHandler = createSwipeToDismissHandler()
+        this.swipeDismissHandler = swipeDismissHandler
         rootContainer.setOnTouchListener(swipeDismissHandler)
 
         if (animate) animateOpen() else prepareViewsForViewer()
@@ -214,7 +216,11 @@ class ImageViewerView<T> @JvmOverloads constructor(
 
     internal fun close() {
         if (shouldDismissToBottom) {
-            swipeDismissHandler.initiateDismissToBottom()
+            try {
+                swipeDismissHandler?.initiateDismissToBottom()
+            } catch (e: Exception) {
+                Timber.w(e)
+            }
         } else {
             animateClose()
         }
@@ -279,7 +285,7 @@ class ImageViewerView<T> @JvmOverloads constructor(
         return when (swipeDirection) {
             UP, DOWN -> {
                 if (isSwipeToDismissAllowed && !wasScaled && imagesPager.isIdle) {
-                    swipeDismissHandler.onTouch(rootContainer, event)
+                    swipeDismissHandler?.onTouch(rootContainer, event) ?: true
                 } else true
             }
             LEFT, RIGHT -> {
@@ -307,13 +313,13 @@ class ImageViewerView<T> @JvmOverloads constructor(
         wasScaled = false
         imagesPager.dispatchTouchEvent(event)
 
-        swipeDismissHandler.onTouch(rootContainer, event)
+        swipeDismissHandler?.onTouch(rootContainer, event)
         isOverlayWasClicked = dispatchOverlayTouch(event)
     }
 
     private fun handleEventActionUp(event: MotionEvent) {
         wasDoubleTapped = false
-        swipeDismissHandler.onTouch(rootContainer, event)
+        swipeDismissHandler?.onTouch(rootContainer, event)
         imagesPager.dispatchTouchEvent(event)
         isOverlayWasClicked = dispatchOverlayTouch(event)
     }
