@@ -13,7 +13,7 @@ internal abstract class RecyclingPagerAdapter<VH : RecyclingPagerAdapter.ViewHol
 
     companion object {
         private val STATE = RecyclingPagerAdapter::class.java.simpleName
-        private const val VIEW_TYPE_IMAGE = 0
+        const val VIEW_TYPE_IMAGE = 0
     }
 
     internal abstract fun getItemCount(): Int
