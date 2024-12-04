@@ -23,7 +23,6 @@ import android.graphics.Rect
 import android.view.View
 import android.view.ViewConfiguration
 import android.view.ViewGroup
-import androidx.core.graphics.Insets
 
 internal val View?.localVisibleRect: Rect
     get() = Rect().also { this?.getLocalVisibleRect(it) }
@@ -109,7 +108,7 @@ internal fun View.switchVisibilityWithAnimation() {
 
         if (isVisible) {
             addListener(object : AnimatorListenerAdapter() {
-                override fun onAnimationEnd(animation: Animator?) {
+                override fun onAnimationEnd(animation: Animator) {
                     makeGone()
                 }
             })
@@ -121,15 +120,3 @@ internal fun View.switchVisibilityWithAnimation() {
     }
 }
 
-fun Insets.toRect(): Rect =
-    Rect(left, top, right, bottom)
-
-operator fun Rect.minus(other: Rect): Rect = apply {
-    set(left - other.left, top - other.top, right - other.right, bottom - other.bottom)
-}
-
-operator fun Rect.plus(other: Rect) = apply {
-    set(left + other.left, top + other.top, right + other.right, bottom + other.bottom)
-}
-
-fun Rect?.orEmpty() = this ?: Rect()

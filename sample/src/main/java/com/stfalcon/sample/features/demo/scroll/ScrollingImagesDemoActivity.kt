@@ -1,11 +1,14 @@
 package com.stfalcon.sample.features.demo.scroll
 
-import android.graphics.Rect
+import android.content.Context
 import android.os.Bundle
+import android.view.View
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.transition.*
+import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
+import com.github.chrisbanes.photoview.PhotoView
 import com.stfalcon.imageviewer.StfalconImageViewer
+import com.stfalcon.imageviewer.common.pager.RecyclingPagerAdapter
 import com.stfalcon.sample.R
 import com.stfalcon.sample.common.extensions.getDrawableCompat
 import com.stfalcon.sample.common.extensions.loadImage
@@ -18,7 +21,7 @@ class ScrollingImagesDemoActivity : AppCompatActivity() {
         listOf(
             scrollingHorizontalFirstImage,
             scrollingHorizontalSecondImage,
-            scrollingVerticalThirdImage,
+            scrollingHorizontalThirdImage,
             scrollingHorizontalFourthImage)
     }
 
@@ -26,7 +29,7 @@ class ScrollingImagesDemoActivity : AppCompatActivity() {
         listOf(
             scrollingVerticalFirstImage,
             scrollingVerticalSecondImage,
-            scrollingHorizontalThirdImage,
+            scrollingVerticalThirdImage,
             scrollingVerticalFourthImage)
     }
 
@@ -56,38 +59,44 @@ class ScrollingImagesDemoActivity : AppCompatActivity() {
         target: ImageView,
         images: List<String>,
         imageViews: List<ImageView>) {
-        viewer = StfalconImageViewer.Builder<String>(this, images, ::loadImage)
-            .withHiddenStatusBar(false)
+        viewer = StfalconImageViewer.Builder<String>(this, images, ::loadImage, ::getItemViewType, ::getItemViewSize, ::createItemView)
             .withStartPosition(startPosition)
             .withTransitionFrom(target)
-            .apply {
-                data.onScaleType = { it?.scaleType }
-                data.onOpenBeforeScaleType = { it?.scaleType }
-                data.onOpenAfterScaleType = { ImageView.ScaleType.FIT_CENTER }
-                //data.offset = Rect(0, -120, 0,  0)
-                data.onTransition = {
-                    TransitionSet().apply {
-                        ordering = TransitionSet.ORDERING_SEQUENTIAL
-                        addTransition(Fade(Fade.OUT))
-                        addTransition(TransitionSet().apply {
-                            ordering = TransitionSet.ORDERING_TOGETHER
-                            //addTransition(ChangeTransform())
-                            addTransition(ChangeBounds())
-                            //addTransition(ChangeClipBounds())
-                            addTransition(ChangeImageTransform())
-                        })
-                        addTransition(Fade(Fade.IN))
-                    }
-                }
-            }
-            .withImageChangeListener { viewer.updateTransitionImage(imageViews.getOrNull(it)) }
-            .show()
+            .withImageChangeListener { viewer.updateTransitionImage(imageViews.getOrNull(it), it) }
+            .show(supportFragmentManager)
     }
 
-    private fun loadImage(imageView: ImageView, url: String?) {
-        imageView.apply {
+    private fun loadImage(view: View, url: String?) {
+        view.apply {
             background = getDrawableCompat(R.drawable.shape_placeholder)
-            loadImage(url)
+            val imageView = view as ImageView
+            imageView.loadImage(url)
         }
     }
+
+    private fun getItemViewType(position: Int): Int {
+        return  Demo.posters[position].viewType
+    }
+
+    private fun getItemViewSize(position: Int): IntArray? {
+        return null
+    }
+
+    private fun createItemView (context : Context, viewType: Int): View{
+        var itemView = View(context)
+        when (viewType) {
+            RecyclingPagerAdapter.VIEW_TYPE_IMAGE -> {
+                itemView = PhotoView(context)
+            }
+
+            RecyclingPagerAdapter.VIEW_TYPE_SUBSAMPLING_IMAGE -> {
+                itemView = SubsamplingScaleImageView(context).apply {
+                    setMinimumScaleType(SubsamplingScaleImageView.SCALE_TYPE_START)
+                    maxScale = 8F
+                }
+            }
+        }
+        return itemView
+    }
+
 }

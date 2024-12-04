@@ -17,42 +17,35 @@
 package com.stfalcon.imageviewer.viewer.builder
 
 import android.graphics.Color
-import android.graphics.Rect
-import android.view.MotionEvent
 import android.view.View
-import android.widget.ImageView
-import androidx.annotation.StyleRes
-import androidx.transition.Transition
-import androidx.viewpager.widget.ViewPager
+import com.stfalcon.imageviewer.common.pager.RecyclingPagerAdapter
 import com.stfalcon.imageviewer.listeners.OnDismissListener
+import com.stfalcon.imageviewer.loader.GetViewType
 import com.stfalcon.imageviewer.listeners.OnImageChangeListener
+import com.stfalcon.imageviewer.listeners.OnStateListener
+import com.stfalcon.imageviewer.loader.GetViewSize
+import com.stfalcon.imageviewer.loader.OnCreateView
 import com.stfalcon.imageviewer.loader.ImageLoader
 
-class BuilderData<T>(
+internal class BuilderData<T>(
     val images: List<T>,
-    val imageLoader: ImageLoader<T>
+    val imageLoader: ImageLoader<T>,
+    val getViewType: GetViewType,
+    val getViewSize: GetViewSize,
+    val createItemView: OnCreateView
 ) {
     var backgroundColor = Color.BLACK
     var startPosition: Int = 0
     var imageChangeListener: OnImageChangeListener? = null
     var onDismissListener: OnDismissListener? = null
+    var onStateListener: OnStateListener? = null
     var overlayView: View? = null
+    var overlayViewSwitchAnimationEnable: Boolean = true
     var imageMarginPixels: Int = 0
-    var containerPaddingPixels = IntArray(4)
-    var shouldStatusBarHide = true
+    var shouldStatusBarHide = false
     var isZoomingAllowed = true
     var isSwipeToDismissAllowed = true
-    var transitionView: ImageView? = null
-    var onScaleType: ((ImageView?) -> ImageView.ScaleType?)? = null
-    var onOpenBeforeScaleType: ((ImageView?) -> ImageView.ScaleType?)? = null
-    var onOpenAfterScaleType: ((ImageView?) -> ImageView.ScaleType?)? = null
-    @StyleRes
-    var style: Int? = null
-    var onTransition: ((Boolean) -> Transition)? = null
-    var onPageChangeListener: ViewPager.OnPageChangeListener? = null
-    var onSingleTapConfirmed: ((MotionEvent) -> Boolean)? = null
-    var onSingleTap: ((MotionEvent) -> Boolean)? = null
-    var onDoubleTap: ((MotionEvent) -> Boolean)? = null
-    var onLongPress: ((MotionEvent) -> Unit)? = null
-    var offset: Rect? = null
+    var transitionView: View? = null
+    var useDialogStyle = false
+    var statusBarTransparent = false
 }

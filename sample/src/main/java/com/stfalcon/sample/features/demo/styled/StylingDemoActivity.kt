@@ -1,10 +1,18 @@
 package com.stfalcon.sample.features.demo.styled
 
+import android.content.Context
+import android.graphics.Color
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.TextView
+import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
+import com.github.chrisbanes.photoview.PhotoView
 import com.stfalcon.imageviewer.StfalconImageViewer
+import com.stfalcon.imageviewer.common.pager.RecyclingPagerAdapter
 import com.stfalcon.sample.R
 import com.stfalcon.sample.common.extensions.showShortToast
 import com.stfalcon.sample.common.models.Demo
@@ -12,14 +20,7 @@ import com.stfalcon.sample.common.models.Poster
 import com.stfalcon.sample.common.ui.base.BaseActivity
 import com.stfalcon.sample.common.ui.views.PosterOverlayView
 import com.stfalcon.sample.features.demo.styled.options.StylingOptions
-import com.stfalcon.sample.features.demo.styled.options.StylingOptions.Property.CONTAINER_PADDING
-import com.stfalcon.sample.features.demo.styled.options.StylingOptions.Property.HIDE_STATUS_BAR
-import com.stfalcon.sample.features.demo.styled.options.StylingOptions.Property.IMAGES_MARGIN
-import com.stfalcon.sample.features.demo.styled.options.StylingOptions.Property.RANDOM_BACKGROUND
-import com.stfalcon.sample.features.demo.styled.options.StylingOptions.Property.SHOW_OVERLAY
-import com.stfalcon.sample.features.demo.styled.options.StylingOptions.Property.SHOW_TRANSITION
-import com.stfalcon.sample.features.demo.styled.options.StylingOptions.Property.SWIPE_TO_DISMISS
-import com.stfalcon.sample.features.demo.styled.options.StylingOptions.Property.ZOOMING
+import com.stfalcon.sample.features.demo.styled.options.StylingOptions.Property.*
 import kotlinx.android.synthetic.main.activity_demo_styling.*
 
 class StylingDemoActivity : BaseActivity() {
@@ -27,7 +28,7 @@ class StylingDemoActivity : BaseActivity() {
     private var options = StylingOptions()
     private var overlayView: PosterOverlayView? = null
     private var viewer: StfalconImageViewer<Poster>? = null
-
+    var posters : MutableList<Poster> = Demo.posters.toMutableList()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_demo_styling)
@@ -49,13 +50,14 @@ class StylingDemoActivity : BaseActivity() {
     }
 
     private fun openViewer(startPosition: Int, imageView: ImageView) {
-        val posters = Demo.posters.toMutableList()
+//        var posters = Demo.posters.toMutableList()
+//        var posters = Demo.posters.toMutableList()
 
-        val builder = StfalconImageViewer.Builder<Poster>(this, posters, ::loadPosterImage)
+        val builder = StfalconImageViewer.Builder<Poster>(this, posters, ::loadPosterImage, ::getItemViewType, ::getItemViewSize, ::createItemView)
             .withStartPosition(startPosition)
             .withImageChangeListener { position ->
                 if (options.isPropertyEnabled(SHOW_TRANSITION)) {
-                    viewer?.updateTransitionImage(stylingPostersGridView.imageViews[position])
+                    viewer?.updateTransitionImage(stylingPostersGridView.imageViews[position], position)
                 }
 
                 overlayView?.update(posters[position])
@@ -66,10 +68,6 @@ class StylingDemoActivity : BaseActivity() {
 
         if (options.isPropertyEnabled(IMAGES_MARGIN)) {
             builder.withImagesMargin(R.dimen.image_margin)
-        }
-
-        if (options.isPropertyEnabled(CONTAINER_PADDING)) {
-            builder.withContainerPadding(R.dimen.image_margin)
         }
 
         if (options.isPropertyEnabled(SHOW_TRANSITION)) {
@@ -88,20 +86,25 @@ class StylingDemoActivity : BaseActivity() {
             builder.withBackgroundColor(getRandomColor())
         }
 
-        viewer = builder.show()
+        viewer = builder.show(supportFragmentManager)
     }
 
-    private fun setupOverlayView(posters: MutableList<Poster>, startPosition: Int) {
+    //删除按钮回调位置
+    private fun setupOverlayView(posterList: MutableList<Poster>, startPosition: Int) {
         overlayView = PosterOverlayView(this).apply {
-            update(posters[startPosition])
+            update(posterList[startPosition])
 
             onDeleteClick = {
-                val currentPosition = viewer?.currentPosition() ?: 0
+                val currentPosition = viewer?.getCurrentItem() ?: 0
+                if (posterList.size > 1){
+                    posterList.removeAt(currentPosition)
+                    viewer?.updateImages(posterList)
+                }else{
+                    viewer?.close()
+                    posters = Demo.posters.toMutableList()
+                }
 
-                posters.removeAt(currentPosition)
-                viewer?.updateImages(posters)
-
-                posters.getOrNull(currentPosition)
+                posterList.getOrNull(currentPosition)
                     ?.let { poster -> update(poster) }
             }
         }
@@ -111,4 +114,39 @@ class StylingDemoActivity : BaseActivity() {
         val random = java.util.Random()
         return android.graphics.Color.argb(255, random.nextInt(156), random.nextInt(156), random.nextInt(156))
     }
+
+    fun getItemViewType(position: Int): Int {
+        return  posters[position].viewType
+    }
+
+    fun getItemViewSize(position: Int): IntArray? {
+        return null
+    }
+
+    fun createItemView (context : Context, viewType: Int): View {
+        var itemView = View(context)
+        when (viewType) {
+            RecyclingPagerAdapter.VIEW_TYPE_IMAGE -> {
+                itemView = PhotoView(context)
+            }
+
+            RecyclingPagerAdapter.VIEW_TYPE_SUBSAMPLING_IMAGE -> {
+                itemView = SubsamplingScaleImageView(context).apply {
+                    setMinimumScaleType(SubsamplingScaleImageView.SCALE_TYPE_START)
+                    maxScale = 8F
+                }
+            }
+
+            RecyclingPagerAdapter.VIEW_TYPE_TEXT->{
+                itemView = TextView(context).apply {
+                    textSize = 20F
+                    setTextColor(Color.WHITE)
+                    width = ViewGroup.LayoutParams.MATCH_PARENT
+                    height = ViewGroup.LayoutParams.MATCH_PARENT
+                }
+            }
+        }
+        return itemView
+    }
+
 }

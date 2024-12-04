@@ -23,7 +23,7 @@ import android.view.MotionEvent
 import androidx.viewpager.widget.ViewPager
 import com.stfalcon.imageviewer.common.extensions.addOnPageChangeListener
 
-class MultiTouchViewPager @JvmOverloads constructor(
+internal class MultiTouchViewPager @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null
 ) : ViewPager(context, attrs) {

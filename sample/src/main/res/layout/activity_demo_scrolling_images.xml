@@ -68,7 +68,6 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="25dp"
-                            android:scaleType="centerCrop"
                             tools:ignore="ContentDescription"/>
 
                         <ImageView
@@ -102,8 +101,7 @@
                     android:id="@+id/scrollingVerticalFirstImage"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
-                    app:layout_constraintDimensionRatio="W,1:1"
-                    android:scaleType="centerCrop"
+                    app:layout_constraintDimensionRatio="W,16:9"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/scrollingVerticalLabel"
@@ -114,8 +112,7 @@
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:layout_marginTop="25dp"
-                    app:layout_constraintDimensionRatio="W,9:16"
-                    android:scaleType="centerCrop"
+                    app:layout_constraintDimensionRatio="W,16:9"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/scrollingVerticalFirstImage"
@@ -127,7 +124,6 @@
                     android:layout_height="0dp"
                     android:layout_marginTop="25dp"
                     app:layout_constraintDimensionRatio="W,16:9"
-                    android:scaleType="centerCrop"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/scrollingVerticalSecondImage"

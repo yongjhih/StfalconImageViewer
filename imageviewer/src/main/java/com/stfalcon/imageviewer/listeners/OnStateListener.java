@@ -14,25 +14,23 @@
  * limitations under the License.
  */
 
-package com.stfalcon.imageviewer.common.gestures.direction
+package com.stfalcon.imageviewer.listeners;
 
-internal enum class SwipeDirection {
-    NOT_DETECTED,
-    UP,
-    DOWN,
-    LEFT,
-    RIGHT;
+import android.view.View;
 
-    companion object {
-        fun fromAngle(angle: Double): SwipeDirection {
-            return when (angle) {
-                in 0.0..45.0 -> RIGHT
-                in 45.0..135.0 -> UP
-                in 135.0..225.0 -> LEFT
-                in 225.0..315.0 -> DOWN
-                in 315.0..360.0 -> RIGHT
-                else -> NOT_DETECTED
-            }
-        }
-    }
+import androidx.annotation.NonNull;
+
+/**
+ * Interface definition for a callback to be invoked when state changed.
+ * */
+//N.B.! This class is written in Java for convenient use of lambdas due to languages compatibility issues.
+public interface OnStateListener {
+
+    void onAnimationStart(@NonNull View view, boolean willDismiss);
+
+    void onAnimationEnd(@NonNull View view, boolean willDismiss);
+
+    void onTrackingStart(@NonNull View view);
+
+    void onTrackingEnd(@NonNull View view);
 }

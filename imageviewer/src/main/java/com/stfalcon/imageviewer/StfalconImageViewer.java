@@ -17,16 +17,23 @@
 package com.stfalcon.imageviewer;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
-import androidx.annotation.*;
+
+import androidx.annotation.ColorInt;
+import androidx.annotation.ColorRes;
+import androidx.annotation.DimenRes;
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
-import androidx.viewpager.widget.ViewPager;
+import androidx.fragment.app.FragmentManager;
 
 import com.stfalcon.imageviewer.listeners.OnDismissListener;
 import com.stfalcon.imageviewer.listeners.OnImageChangeListener;
+import com.stfalcon.imageviewer.listeners.OnStateListener;
+import com.stfalcon.imageviewer.loader.GetViewSize;
+import com.stfalcon.imageviewer.loader.GetViewType;
 import com.stfalcon.imageviewer.loader.ImageLoader;
+import com.stfalcon.imageviewer.loader.OnCreateView;
 import com.stfalcon.imageviewer.viewer.builder.BuilderData;
 import com.stfalcon.imageviewer.viewer.dialog.ImageViewerDialog;
 
@@ -38,40 +45,22 @@ import java.util.List;
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class StfalconImageViewer<T> {
 
-    @NonNull
     private final Context context;
-    @NonNull
-    public final BuilderData<T> builderData;
-    @NonNull
+    private final BuilderData<T> builderData;
     private final ImageViewerDialog<T> dialog;
-    @NonNull
-    public final ViewPager viewPager;
 
     protected StfalconImageViewer(@NonNull Context context, @NonNull BuilderData<T> builderData) {
         this.context = context;
         this.builderData = builderData;
         this.dialog = new ImageViewerDialog<>(context, builderData);
-        this.viewPager = dialog.viewerView.getImagesPager();
     }
 
     /**
      * Displays the built viewer if passed list of images is not empty
      */
-    public void show() {
-        show(true);
-    }
-
-    /**
-     * Displays the built viewer if passed list of images is not empty
-     *
-     * @param animate whether the passed transition view should be animated on open. Useful for screen rotation handling.
-     */
-    public void show(boolean animate) {
+    public void show(FragmentManager fm) {
         if (!builderData.getImages().isEmpty()) {
-            dialog.show(animate);
-        } else {
-            Log.w(context.getString(R.string.library_name),
-                    "Images list cannot be empty! Viewer ignored.");
+            dialog.show(fm);
         }
     }
 
@@ -100,50 +89,39 @@ public class StfalconImageViewer<T> {
      * Updates an existing images list if a new list is not empty, otherwise closes the viewer
      */
     public void updateImages(List<T> images) {
-        if (!images.isEmpty()) {
-            dialog.updateImages(images);
-        } else {
+        if (images.isEmpty()) {
             dialog.close();
+        } else {
+            dialog.updateImages(images);
         }
     }
 
-    public int currentPosition() {
-        return dialog.getCurrentPosition();
+    public int getCurrentItem() {
+        return dialog.getCurrentItem();
     }
 
-    public int setCurrentPosition(int position){
-        return dialog.setCurrentPosition(position);
+    public void setCurrentItem(int position, boolean smoothScroll) {
+        dialog.setCurrentItem(position, smoothScroll);
     }
 
     /**
      * Updates transition image view.
      * Useful for a case when image position has changed and you want to update the transition animation target.
      */
-    public void updateTransitionImage(ImageView imageView) {
-        dialog.updateTransitionImage(imageView);
+    public void updateTransitionImage(View view, int position) {
+        dialog.updateTransitionImage(view, position);
     }
 
     /**
      * Builder class for {@link StfalconImageViewer}
      */
     public static class Builder<T> {
-
-        @NonNull
         private final Context context;
-        @NonNull
-        public final BuilderData<T> data;
+        private final BuilderData<T> data;
 
-        public Builder(
-                @NonNull
-                Context context, T[] images, ImageLoader<T> imageLoader) {
-            this(context, new ArrayList<>(Arrays.asList(images)), imageLoader);
-        }
-
-        public Builder(
-                @NonNull
-                Context context, List<T> images, ImageLoader<T> imageLoader) {
+        public Builder(Context context, List<T> images, ImageLoader<T> imageLoader, GetViewType getViewType, GetViewSize getViewSize, OnCreateView createItemView) {
             this.context = context;
-            this.data = new BuilderData<>(images, imageLoader);
+            this.data = new BuilderData<>(images, imageLoader, getViewType, getViewSize, createItemView);
         }
 
         /**
@@ -187,6 +165,16 @@ public class StfalconImageViewer<T> {
         }
 
         /**
+         * Enables or disables custom overlay view switch animation. True by default.
+         *
+         * @return This Builder object to allow calls chaining
+         */
+        public Builder<T> withOverlayViewSwitchAnimation(boolean enable) {
+            this.data.setOverlayViewSwitchAnimationEnable(enable);
+            return this;
+        }
+
+        /**
          * Sets space between the images using dimension.
          *
          * @return This Builder object to allow calls chaining
@@ -203,52 +191,6 @@ public class StfalconImageViewer<T> {
          */
         public Builder<T> withImageMarginPixels(int marginPixels) {
             this.data.setImageMarginPixels(marginPixels);
-            return this;
-        }
-
-        /**
-         * Sets overall padding for zooming and scrolling area using dimension.
-         *
-         * @return This Builder object to allow calls chaining
-         */
-        public Builder<T> withContainerPadding(@DimenRes int padding) {
-            int paddingPx = Math.round(context.getResources().getDimension(padding));
-            return withContainerPaddingPixels(paddingPx, paddingPx, paddingPx, paddingPx);
-        }
-
-        /**
-         * Sets `start`, `top`, `end` and `bottom` padding for zooming and scrolling area using dimension.
-         *
-         * @return This Builder object to allow calls chaining
-         */
-        public Builder<T> withContainerPadding(@DimenRes int start, @DimenRes int top,
-                                               @DimenRes int end, @DimenRes int bottom
-        ) {
-            withContainerPaddingPixels(
-                    Math.round(context.getResources().getDimension(start)),
-                    Math.round(context.getResources().getDimension(top)),
-                    Math.round(context.getResources().getDimension(end)),
-                    Math.round(context.getResources().getDimension(bottom)));
-            return this;
-        }
-
-        /**
-         * Sets overall padding for zooming and scrolling area in pixels.
-         *
-         * @return This Builder object to allow calls chaining
-         */
-        public Builder<T> withContainerPaddingPixels(@Px int padding) {
-            this.data.setContainerPaddingPixels(new int[]{padding, padding, padding, padding});
-            return this;
-        }
-
-        /**
-         * Sets `start`, `top`, `end` and `bottom` padding for zooming and scrolling area in pixels.
-         *
-         * @return This Builder object to allow calls chaining
-         */
-        public Builder<T> withContainerPaddingPixels(int start, int top, int end, int bottom) {
-            this.data.setContainerPaddingPixels(new int[]{start, top, end, bottom});
             return this;
         }
 
@@ -287,8 +229,28 @@ public class StfalconImageViewer<T> {
          *
          * @return This Builder object to allow calls chaining
          */
-        public Builder<T> withTransitionFrom(ImageView imageView) {
-            this.data.setTransitionView(imageView);
+        public Builder<T> withTransitionFrom(View view) {
+            this.data.setTransitionView(view);
+            return this;
+        }
+
+
+        /**
+         * Sets a target {@link Boolean} Whether dialog uses the theme of the parent class
+         *
+         * @return This Builder object to allow calls chaining
+         */
+        public Builder<T> withUseDialogStyle(Boolean useDialogStyle) {
+            this.data.setUseDialogStyle(useDialogStyle);
+            return this;
+        }
+
+        /**
+         * 设置状态栏透明
+         * @return This Builder object to allow calls chaining
+         */
+        public Builder<T> withStatusBarTransparent(Boolean statusBarTransparent) {
+            this.data.setStatusBarTransparent(statusBarTransparent);
             return this;
         }
 
@@ -313,9 +275,19 @@ public class StfalconImageViewer<T> {
         }
 
         /**
+         * Sets {@link OnStateListener} for viewer.
+         *
+         * @return This Builder object to allow calls chaining
+         */
+        public Builder<T> withStateListener(OnStateListener onStateListener) {
+            this.data.setOnStateListener(onStateListener);
+            return this;
+        }
+
+        /**
          * Creates a {@link StfalconImageViewer} with the arguments supplied to this builder. It does not
          * show the dialog. This allows the user to do any extra processing
-         * before displaying the dialog. Use {@link #show()} if you don't have any other processing
+         * before displaying the dialog. Use {@link #show(FragmentManager)} if you don't have any other processing
          * to do and want this to be created and displayed.
          */
         public StfalconImageViewer<T> build() {
@@ -326,19 +298,9 @@ public class StfalconImageViewer<T> {
          * Creates the {@link StfalconImageViewer} with the arguments supplied to this builder and
          * shows the dialog.
          */
-        public StfalconImageViewer<T> show() {
-            return show(true);
-        }
-
-        /**
-         * Creates the {@link StfalconImageViewer} with the arguments supplied to this builder and
-         * shows the dialog.
-         *
-         * @param animate whether the passed transition view should be animated on open. Useful for screen rotation handling.
-         */
-        public StfalconImageViewer<T> show(boolean animate) {
+        public StfalconImageViewer<T> show(FragmentManager fm) {
             StfalconImageViewer<T> viewer = build();
-            viewer.show(animate);
+            viewer.show(fm);
             return viewer;
         }
     }

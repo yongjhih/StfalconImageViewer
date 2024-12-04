@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="false"
@@ -11,36 +11,39 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-
         <activity
-            android:name="com.stfalcon.sample.features.main.MainActivity"
+            android:name=".features.main.TestActivity"
+            android:exported="false" />
+        <activity
+            android:name=".features.main.MainActivity"
             android:screenOrientation="portrait"
-            android:theme="@style/AppThemeNoActionBar">
+            android:theme="@style/AppThemeNoActionBar"
+            android:exported="true">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity
-            android:name="com.stfalcon.sample.features.demo.grid.PostersGridDemoActivity"
+            android:name=".features.demo.grid.PostersGridDemoActivity"
             android:label="@string/action_images_grid"
-            android:screenOrientation="portrait"/>
-
+            android:screenOrientation="portrait"
+            android:exported="false" />
         <activity
-            android:name="com.stfalcon.sample.features.demo.scroll.ScrollingImagesDemoActivity"
+            android:name=".features.demo.scroll.ScrollingImagesDemoActivity"
             android:label="@string/action_scroll"
-            android:screenOrientation="portrait"/>
-
+            android:screenOrientation="portrait"
+            android:exported="false" />
         <activity
-            android:name="com.stfalcon.sample.features.demo.styled.StylingDemoActivity"
+            android:name=".features.demo.styled.StylingDemoActivity"
             android:label="@string/action_style"
-            android:screenOrientation="portrait"/>
-
+            android:screenOrientation="portrait"
+            android:exported="false" />
         <activity
-            android:name="com.stfalcon.sample.features.demo.rotation.RotationDemoActivity"
-            android:label="@string/action_rotation"/>
-
+            android:name=".features.demo.rotation.RotationDemoActivity"
+            android:label="@string/action_rotation"
+            android:exported="false" />
     </application>
 
 </manifest>

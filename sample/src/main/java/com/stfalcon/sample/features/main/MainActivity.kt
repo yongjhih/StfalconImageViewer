@@ -2,6 +2,7 @@ package com.stfalcon.sample.features.main
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.WindowInsets
 import androidx.appcompat.app.AppCompatActivity
 import com.stfalcon.sample.R
 import com.stfalcon.sample.features.demo.grid.PostersGridDemoActivity
@@ -29,6 +30,7 @@ class MainActivity : AppCompatActivity(),
             offscreenPageLimit = 3
         }
         mainCardsPagerIndicator.setViewPager(mainCardsViewPager)
+
     }
 
     override fun onCardAction(actionId: Int) {
@@ -37,7 +39,8 @@ class MainActivity : AppCompatActivity(),
                 startActivity(Intent(this, PostersGridDemoActivity::class.java))
             }
             ID_SCROLL -> {
-                startActivity(Intent(this, ScrollingImagesDemoActivity::class.java))
+//                startActivity(Intent(this, ScrollingImagesDemoActivity::class.java))
+                startActivity(Intent(this, TestActivity::class.java))
             }
             ID_STYLING -> {
                 startActivity(Intent(this, StylingDemoActivity::class.java))

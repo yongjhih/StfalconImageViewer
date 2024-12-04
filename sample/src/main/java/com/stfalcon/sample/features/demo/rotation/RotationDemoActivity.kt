@@ -1,9 +1,14 @@
 package com.stfalcon.sample.features.demo.rotation
 
+import android.content.Context
 import android.os.Bundle
+import android.view.View
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
+import com.github.chrisbanes.photoview.PhotoView
 import com.stfalcon.imageviewer.StfalconImageViewer
+import com.stfalcon.imageviewer.common.pager.RecyclingPagerAdapter
 import com.stfalcon.sample.R
 import com.stfalcon.sample.common.extensions.getDrawableCompat
 import com.stfalcon.sample.common.extensions.loadImage
@@ -38,8 +43,10 @@ class RotationDemoActivity : AppCompatActivity() {
 
     override fun onRestoreInstanceState(savedInstanceState: Bundle) {
         super.onRestoreInstanceState(savedInstanceState)
-        isDialogShown = savedInstanceState.getBoolean(KEY_IS_DIALOG_SHOWN)
-        currentPosition = savedInstanceState.getInt(KEY_CURRENT_POSITION)
+        if (savedInstanceState != null) {
+            isDialogShown = savedInstanceState.getBoolean(KEY_IS_DIALOG_SHOWN)
+            currentPosition = savedInstanceState.getInt(KEY_CURRENT_POSITION)
+        }
 
         if (isDialogShown) {
             openViewer(currentPosition)
@@ -53,28 +60,65 @@ class RotationDemoActivity : AppCompatActivity() {
     }
 
     private fun openViewer(startPosition: Int) {
-        viewer = StfalconImageViewer.Builder<Poster>(this, Demo.posters, ::loadPosterImage)
-            .withHiddenStatusBar(false)
+        viewer = StfalconImageViewer.Builder<Poster>(this, Demo.posters, ::loadPosterImage, ::getItemViewType, ::getItemViewSize, ::createItemView)
             .withTransitionFrom(getTransitionTarget(startPosition))
             .withStartPosition(startPosition)
             .withImageChangeListener {
                 currentPosition = it
-                viewer.updateTransitionImage(getTransitionTarget(it))
+                viewer.updateTransitionImage(getTransitionTarget(it), it)
             }
             .withDismissListener { isDialogShown = false }
-            .show(!isDialogShown)
+            .show(supportFragmentManager)
 
         currentPosition = startPosition
         isDialogShown = true
     }
 
-    private fun loadPosterImage(imageView: ImageView, poster: Poster?) {
-        imageView.apply {
+    private fun loadPosterImage(view: View, poster: Poster?) {
+        view.apply {
             background = getDrawableCompat(R.drawable.shape_placeholder)
-            loadImage(poster?.url)
+            when (poster?.viewType) {
+                RecyclingPagerAdapter.VIEW_TYPE_IMAGE -> {
+                    val imageView = view as ImageView
+                    imageView.loadImage(poster?.url)
+                }
+
+                RecyclingPagerAdapter.VIEW_TYPE_SUBSAMPLING_IMAGE -> {
+                        val subsamplingScaleImageView = view as SubsamplingScaleImageView
+                        subsamplingScaleImageView.loadImage(poster?.url)
+
+                }
+            }
         }
     }
 
     private fun getTransitionTarget(position: Int) =
         if (position == 0) rotationDemoImage else null
+
+
+    fun getItemViewType(position: Int): Int {
+        return  Demo.posters[position].viewType
+    }
+
+    fun getItemViewSize(position: Int): IntArray? {
+        return null
+    }
+
+    fun createItemView (context : Context, viewType: Int): View{
+        var itemView = View(context)
+        when (viewType) {
+            RecyclingPagerAdapter.VIEW_TYPE_IMAGE -> {
+                itemView = PhotoView(context)
+            }
+
+            RecyclingPagerAdapter.VIEW_TYPE_SUBSAMPLING_IMAGE -> {
+                itemView = SubsamplingScaleImageView(context).apply {
+                    setMinimumScaleType(SubsamplingScaleImageView.SCALE_TYPE_START)
+                    maxScale = 8F
+                }
+            }
+        }
+        return itemView
+    }
+
 }

@@ -3,7 +3,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 33
     defaultConfig {
         applicationId "com.stfalcon.stfalconimageviewersample"
         minSdkVersion 21
@@ -34,4 +34,6 @@ dependencies {
     //UI
     implementation 'com.squareup.picasso:picasso:2.71828'
     implementation 'me.relex:circleindicator:2.1.6'
+    implementation 'com.davemorrissey.labs:subsampling-scale-image-view-androidx:3.10.0'
+    implementation "androidx.viewpager2:viewpager2:1.0.0"
 }

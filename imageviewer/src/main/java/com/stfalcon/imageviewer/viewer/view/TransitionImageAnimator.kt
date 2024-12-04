@@ -16,188 +16,64 @@
 
 package com.stfalcon.imageviewer.viewer.view
 
-import android.util.Log
+
+import android.animation.Animator
+import android.animation.ObjectAnimator
+import android.animation.PropertyValuesHolder
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.*
-import android.widget.FrameLayout
-import android.widget.ImageView
-import androidx.core.view.ViewCompat
-import androidx.transition.AutoTransition
-import androidx.transition.Transition
-import androidx.transition.TransitionManager
-import com.stfalcon.imageviewer.common.extensions.*
-import com.stfalcon.imageviewer.viewer.builder.BuilderData
-import kotlin.math.max
+import android.view.animation.Animation
+import android.view.animation.AnimationSet
+import android.view.animation.ScaleAnimation
+import android.view.animation.TranslateAnimation
+import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager2.widget.ViewPager2
+import com.github.chrisbanes.photoview.PhotoView
+import com.stfalcon.imageviewer.common.extensions.isRectVisible
+import com.stfalcon.imageviewer.common.pager.RecyclingPagerAdapter
+import kotlin.math.min
 
-internal class OldTransitionImageAnimator(
-    private val externalImage: ImageView?,
-    private val internalImage: ImageView,
-    private val internalImageContainer: FrameLayout,
-    private val data: BuilderData<*>
-) {
-
-    companion object {
-        private const val TRANSITION_DURATION_OPEN = 200L
-        private const val TRANSITION_DURATION_CLOSE = 250L
-    }
-
-    internal var isAnimating = false
-
-    private var isClosing = false
-
-    private val transitionDuration: Long
-        get() = if (isClosing) TRANSITION_DURATION_CLOSE else TRANSITION_DURATION_OPEN
-
-    private val internalRoot: ViewGroup
-        get() = internalImageContainer.parent as ViewGroup
-
-    internal fun animateOpen(
-        containerPadding: IntArray,
-        onTransitionStart: (Long) -> Unit,
-        onTransitionEnd: () -> Unit
-    ) {
-        if (externalImage.isRectVisible) {
-            onTransitionStart(TRANSITION_DURATION_OPEN)
-            doOpenTransition(containerPadding, onTransitionEnd)
-        } else {
-            onTransitionEnd()
-        }
-    }
-
-    internal fun animateClose(
-        shouldDismissToBottom: Boolean,
-        onTransitionStart: (Long) -> Unit,
-        onTransitionEnd: () -> Unit
-    ) {
-        if (externalImage.isRectVisible && !shouldDismissToBottom) {
-            onTransitionStart(TRANSITION_DURATION_CLOSE)
-            doCloseTransition(onTransitionEnd)
-        } else {
-            externalImage?.visibility = View.VISIBLE
-            onTransitionEnd()
-        }
-    }
-
-    private fun doOpenTransition(containerPadding: IntArray, onTransitionEnd: () -> Unit) {
-        isAnimating = true
-        data.onOpenBeforeScaleType?.invoke(externalImage)?.let { internalImage.scaleType = it }
-        prepareTransitionLayout()
-        internalRoot.postApply {
-            data.onOpenAfterScaleType?.invoke(externalImage)?.let { internalImage.scaleType = it }
-            //ain't nothing but a kludge to prevent blinking when transition is starting
-            externalImage?.postDelayed(50) { visibility = View.INVISIBLE }
-
-            TransitionManager.beginDelayedTransition(internalRoot, createTransition {
-                if (!isClosing) {
-                    isAnimating = false
-                    onTransitionEnd()
-                }
-            })
-
-            internalImageContainer.makeViewMatchParent()
-            internalImage.makeViewMatchParent()
-
-            internalRoot.applyMargin(
-                containerPadding[0],
-                containerPadding[1],
-                containerPadding[2],
-                containerPadding[3])
-
-            internalImageContainer.requestLayout()
-        }
-    }
-
-    private fun doCloseTransition(onTransitionEnd: () -> Unit) {
-        isAnimating = true
-        isClosing = true
-
-        TransitionManager.beginDelayedTransition(
-            internalRoot, createTransition { handleCloseTransitionEnd(onTransitionEnd) })
-
-        data.onScaleType?.invoke(externalImage)?.let { internalImage.scaleType = it }
-        prepareTransitionLayout()
-        internalImageContainer.requestLayout()
-    }
-
-    private fun prepareTransitionLayout() {
-        externalImage?.let { externalImage ->
-            val localVisibleRect = externalImage.localVisibleRect
-            val globalVisibleRect = externalImage.globalVisibleRect
-            val isRectVisible = localVisibleRect != globalVisibleRect
-            Log.v("ImageViewer", "externalImage.size: ${externalImage.width}, ${externalImage.height}")
-            Log.v("ImageViewer", "externalImage.localVisibleRect: ${localVisibleRect}")
-            Log.v("ImageViewer", "externalImage.globalVisibleRect: ${globalVisibleRect}")
-            val insetsRect = ViewCompat.getRootWindowInsets(externalImage)?.stableInsets?.toRect().orEmpty()
-            Log.v("ImageViewer", "externalImage.stableInsets: ${insetsRect}")
-            val offset = data.offset.orEmpty()
-
-            if (isRectVisible) {
-                localVisibleRect.run {
-                    internalImage.requestNewSize(externalImage.width, externalImage.height)
-                    internalImage.applyMargin(
-                        top = -top + offset.top, start = -left + offset.left)
-                }
-                globalVisibleRect.run {
-                    internalImageContainer.requestNewSize(width(), height())
-                    internalImageContainer.applyMargin(left, top)
-                }
-            }
-
-            resetRootTranslation()
-        }
-    }
-
-    private fun handleCloseTransitionEnd(onTransitionEnd: () -> Unit) {
-        externalImage?.visibility = View.VISIBLE
-        internalImage.post { onTransitionEnd() }
-        isAnimating = false
-    }
-
-    private fun resetRootTranslation() {
-        internalRoot
-            .animate()
-            .translationY(0f)
-            .setDuration(transitionDuration)
-            .start()
-    }
-
-    private fun createTransition(onTransitionEnd: (() -> Unit)? = null): Transition =
-        (data.onTransition?.invoke(isClosing) ?: AutoTransition()
-            .setDuration(transitionDuration)
-            .setInterpolator(DecelerateInterpolator()))
-            .addListener(onTransitionEnd = { onTransitionEnd?.invoke() })
-}
 
 internal class TransitionImageAnimator(
-    private val externalImage: ImageView?,
-    private val internalImage: ImageView,
-    private val internalImageContainer: FrameLayout,
-    private val data: BuilderData<*>
+    private val externalImage: View?,
+    private var internalImage: View?,
+    private val imageSize: IntArray?
 ) {
 
     companion object {
         private const val TRANSITION_DURATION = 250L
     }
 
-    private val internalRoot: ViewGroup
-        get() = internalImageContainer.parent as ViewGroup
-
     internal var isAnimating = false
     private var isClosing = false
-    private var scaleNumber: Float = 1f
+    private var scaleNumber: Float = 0f
     private var resetToXValue: Float = 0f
     private var resetToYValue: Float = 0f
-
+    var viewType = RecyclingPagerAdapter.VIEW_TYPE_IMAGE
+    var scaleSize = 1.0f
     internal fun animateOpen(
-        containerPadding: IntArray,
         onTransitionStart: (Long) -> Unit,
         onTransitionEnd: () -> Unit
     ) {
-        updateTransitionView()
         if (externalImage.isRectVisible) {
             onTransitionStart(TRANSITION_DURATION)
-            doOpenTransition(containerPadding, onTransitionEnd)
+            doOpenTransition(onTransitionEnd)
+        } else {
+            onTransitionEnd()
+        }
+    }
+
+    internal fun transitionAnimateClose(
+        translationX: Float,
+        translationY: Float,
+        scaleTemp: Float,
+        shouldDismissToBottom: Boolean,
+        onTransitionStart: (Long) -> Unit,
+        onTransitionEnd: () -> Unit
+    ) {
+        if (externalImage.isRectVisible && !shouldDismissToBottom) {
+            onTransitionStart(TRANSITION_DURATION)
+            doCloseTransition(translationX, translationY, scaleTemp, onTransitionEnd)
         } else {
             onTransitionEnd()
         }
@@ -208,7 +84,6 @@ internal class TransitionImageAnimator(
         onTransitionStart: (Long) -> Unit,
         onTransitionEnd: () -> Unit
     ) {
-        updateTransitionView()
         if (externalImage.isRectVisible && !shouldDismissToBottom) {
             onTransitionStart(TRANSITION_DURATION)
             doCloseTransition(onTransitionEnd)
@@ -217,14 +92,53 @@ internal class TransitionImageAnimator(
         }
     }
 
-    private fun doOpenTransition(containerPadding: IntArray, onTransitionEnd: () -> Unit) {
+    private fun doOpenTransition(onTransitionEnd: () -> Unit) {
         isAnimating = true
-        internalRoot.applyMargin(
-            containerPadding[0],
-            containerPadding[1],
-            containerPadding[2],
-            containerPadding[3])
         startAnimation(internalImage, externalImage, onTransitionEnd, true)
+
+    }
+
+
+    private fun doCloseTransition(
+        translationX: Float,
+        translationY: Float,
+        scaleTemp: Float,
+        onTransitionEnd: () -> Unit
+    ) {
+        isAnimating = true
+        isClosing = true
+        val p1: PropertyValuesHolder =
+            PropertyValuesHolder.ofFloat("translationX", translationX, resetToXValue)
+        val p2: PropertyValuesHolder =
+            PropertyValuesHolder.ofFloat("translationY", translationY, resetToYValue)
+        val p3: PropertyValuesHolder =
+            PropertyValuesHolder.ofFloat("scaleX", scaleTemp, scaleNumber)
+        val p4: PropertyValuesHolder =
+            PropertyValuesHolder.ofFloat("scaleY", scaleTemp, scaleNumber)
+        val animator: ObjectAnimator =
+            ObjectAnimator.ofPropertyValuesHolder(internalImage, p1, p2, p3, p4)
+        animator.duration = TRANSITION_DURATION
+        animator.addListener(object : Animator.AnimatorListener {
+            override fun onAnimationStart(p0: Animator) {
+
+            }
+
+            override fun onAnimationEnd(p0: Animator) {
+                if (!isClosing) {
+                    isAnimating = false
+                }
+                onTransitionEnd.invoke()
+            }
+
+            override fun onAnimationCancel(p0: Animator) {
+
+            }
+
+            override fun onAnimationRepeat(p0: Animator) {
+
+            }
+        })
+        animator.start()
     }
 
 
@@ -232,30 +146,41 @@ internal class TransitionImageAnimator(
         isAnimating = true
         isClosing = true
         startAnimation(internalImage, externalImage, onTransitionEnd, false)
+
     }
 
-    fun updateTransitionView() {
-        if (externalImage == null) {
-            scaleNumber = 1f
-            resetToXValue = 0f
-            resetToYValue = 0f
-            return
+    fun updateTransitionView(itemView: View?, externalImage: View?) {
+        this.internalImage = itemView!!
+        // 缩放动画
+        val transitionWidth = (imageSize?.let { array ->
+            val scale = min(array[0] * 1F / externalImage!!.width, array[1] * 1F / externalImage.height)
+            array[0] / scale
+        } ?: externalImage!!.width).toFloat()
+        val transitionHeight = (imageSize?.let { array ->
+            val scale = min(array[0] * 1F / externalImage!!.width, array[1] * 1F / externalImage.height)
+            array[1] / scale
+        } ?: externalImage!!.height).toFloat()
+        val scaleX = transitionWidth / itemView.width
+        val scaleY = transitionHeight / itemView.height
+        val toX = if (scaleX > scaleY) {  // 哪个缩放的比例小就用哪个(例如: 0.9 收缩比例 比0.3要小)
+            scaleX
+        } else {
+            scaleY
         }
-        val itemView = internalImage
-        val scaleX = externalImage.width * 1f / itemView.width
-        val scaleY = externalImage.height * 1f / itemView.height
-        scaleNumber = max(scaleX, scaleY)
+        // 保存缩放比例,拖动缩小后恢复到原图大小需用到比例
+        scaleNumber = toX
 
-        // target center location
+        //平移到外部imageView的中心点
         val location = IntArray(2)
-        externalImage.getLocationOnScreen(location)
+        externalImage!!.getLocationOnScreen(location)
 
         val externalCenterX = (location[0] + externalImage.width / 2)
         val externalCenterY = (location[1] + externalImage.height / 2)
 
-        // center of itemView
+        //获取itemView中心点
         val itemViewLocation = IntArray(2)
         itemView.getLocationOnScreen(itemViewLocation)
+
 
         val centerX = itemViewLocation[0] + itemView.width / 2
         val centerY = itemViewLocation[1] + itemView.height / 2
@@ -273,15 +198,48 @@ internal class TransitionImageAnimator(
         onTransitionEnd: (() -> Unit)? = null,
         isOpen: Boolean
     ) {
-        if (itemView == null || externalImage == null) {
-            return
+        val transitionWidth = (imageSize?.let { array ->
+            val scale = min(array[0] * 1F / externalImage!!.width, array[1] * 1F / externalImage.height)
+            array[0] / scale
+        } ?: externalImage!!.width).toFloat()
+        val transitionHeight = (imageSize?.let { array ->
+            val scale = min(array[0] * 1F / externalImage!!.width, array[1] * 1F / externalImage.height)
+            array[1] / scale
+        } ?: externalImage!!.height).toFloat()
+
+        // 缩放动画
+        val scaleX = transitionWidth / itemView!!.width
+        val scaleY = transitionHeight / itemView.height
+        val toX = if (scaleX > scaleY) { //那个缩放的比例小就用哪个(例如: 0.9 收缩比例 比0.3要小)
+            scaleX
+        } else {
+            scaleY
         }
-        val scaleX = externalImage.width * 1f / itemView.width
-        val scaleY = externalImage.height * 1f / itemView.height
-        val toX = max(scaleX, scaleY)
+
+        if (!isOpen && viewType == RecyclingPagerAdapter.VIEW_TYPE_IMAGE) {
+            fun animResetScale(view: View?) {
+                if (view is PhotoView) {
+                    view.setScale(1F, true)
+                    return
+                }
+                if (view is ViewGroup) {
+                    val count = view.childCount
+                    for (index in 0..count) {
+                        val childView = view.getChildAt(index)
+                        animResetScale(childView)
+                    }
+                }
+            }
+            // itemView 是 dismissContainer, FrameLayout 包裹一个 ViewPager2, @see image_viewer_mage_viewer
+            val viewPager2 =
+                itemView.findViewById<ViewPager2>(com.stfalcon.imageviewer.R.id.imagesPager)
+            val childView =
+                (viewPager2.getChildAt(0) as RecyclerView).layoutManager?.findViewByPosition(viewPager2.currentItem)
+            animResetScale(childView)
+        }
 
         scaleNumber = toX
-        // scale itself by center
+        //以自己为中心进行缩放
         val scaleAnimation: ScaleAnimation = if (isOpen) {
             ScaleAnimation(
                 toX,
@@ -306,14 +264,14 @@ internal class TransitionImageAnimator(
             )
         }
 
-        // target center location
+        //平移到外部imageView的中心点
         val location = IntArray(2)
-        externalImage.getLocationOnScreen(location)
+        externalImage!!.getLocationOnScreen(location)
 
         val externalCenterX = (location[0] + externalImage.width / 2)
         val externalCenterY = (location[1] + externalImage.height / 2)
 
-        // center of itemView
+        //获取itemView中心点
         val itemViewLocation = IntArray(2)
         itemView.getLocationOnScreen(itemViewLocation)
 
@@ -329,17 +287,25 @@ internal class TransitionImageAnimator(
 
         val translateAnimation: TranslateAnimation = if (isOpen) {
             TranslateAnimation(
-                Animation.ABSOLUTE, toXValue,
-                Animation.ABSOLUTE, 0f,
-                Animation.ABSOLUTE, toYValue,
-                Animation.ABSOLUTE, 0f
+                Animation.ABSOLUTE,
+                toXValue,
+                Animation.ABSOLUTE,
+                0f,
+                Animation.ABSOLUTE,
+                toYValue,
+                Animation.ABSOLUTE,
+                0f
             )
         } else {
             TranslateAnimation(
-                Animation.ABSOLUTE, 0f,
-                Animation.ABSOLUTE, toXValue,
-                Animation.ABSOLUTE, 0f,
-                Animation.ABSOLUTE, toYValue
+                Animation.ABSOLUTE,
+                0f,
+                Animation.ABSOLUTE,
+                toXValue,
+                Animation.ABSOLUTE,
+                0f,
+                Animation.ABSOLUTE,
+                toYValue
             )
         }
 
@@ -356,7 +322,7 @@ internal class TransitionImageAnimator(
             }
 
             override fun onAnimationEnd(p0: Animation?) {
-                externalImage.visibility = View.VISIBLE
+                //结束以后关闭dialog即可
                 if (!isClosing) {
                     isAnimating = false
                 }
