@@ -51,8 +51,6 @@ import com.stfalcon.imageviewer.loader.ImageLoader
 import com.stfalcon.imageviewer.viewer.adapter.ImagesPagerAdapter
 import com.stfalcon.imageviewer.viewer.builder.BuilderData
 import timber.log.Timber
-import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
 
 class ImageViewerView<T> @JvmOverloads constructor(
     context: Context,
