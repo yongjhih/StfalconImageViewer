@@ -26,6 +26,7 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.RelativeLayout
 import androidx.core.view.GestureDetectorCompat
+import androidx.core.view.postDelayed
 import com.stfalcon.imageviewer.R
 import com.stfalcon.imageviewer.common.extensions.addOnPageChangeListener
 import com.stfalcon.imageviewer.common.extensions.animateAlpha
@@ -50,6 +51,8 @@ import com.stfalcon.imageviewer.loader.ImageLoader
 import com.stfalcon.imageviewer.viewer.adapter.ImagesPagerAdapter
 import com.stfalcon.imageviewer.viewer.builder.BuilderData
 import timber.log.Timber
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 class ImageViewerView<T> @JvmOverloads constructor(
     context: Context,
@@ -203,15 +206,21 @@ class ImageViewerView<T> @JvmOverloads constructor(
 
         externalTransitionImageView = transitionImageView
 
-        imageLoader?.loadImage(this.transitionImageView, images[startPosition])
         this.transitionImageView.copyBitmapFrom(transitionImageView)
+        // async
+        imageLoader?.loadImage(this.transitionImageView, images[startPosition])
 
         transitionImageAnimator = createTransitionImageAnimator(transitionImageView)
         val swipeDismissHandler = createSwipeToDismissHandler()
         this.swipeDismissHandler = swipeDismissHandler
         rootContainer.setOnTouchListener(swipeDismissHandler)
 
-        if (animate) animateOpen() else prepareViewsForViewer()
+        transitionImageContainer.makeGone()
+        imagesPager.makeGone()
+        postDelayed(100L) { // wait for cached async loadImage
+            prepareViewsForTransition()
+            if (animate) animateOpen() else prepareViewsForViewer()
+        }
     }
 
     internal fun close() {

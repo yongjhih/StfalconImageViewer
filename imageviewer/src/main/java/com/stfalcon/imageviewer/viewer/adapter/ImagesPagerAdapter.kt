@@ -19,6 +19,7 @@ package com.stfalcon.imageviewer.viewer.adapter
 import android.content.Context
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.postDelayed
 import com.github.chrisbanes.photoview.PhotoView
 import com.stfalcon.imageviewer.common.extensions.resetScale
 import com.stfalcon.imageviewer.common.pager.RecyclingPagerAdapter
