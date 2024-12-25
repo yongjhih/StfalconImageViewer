@@ -284,7 +284,7 @@ class ImageViewerView<T> @JvmOverloads constructor(
         backgroundView.alpha = 1f
         imagesPager.makeVisible()
         // wait for imagesPager invalidated
-        postDelayed(100L) { transitionImageContainer.makeGone() }
+        postDelayed(200L) { transitionImageContainer.makeGone() }
     }
 
     private fun handleTouchIfNotScaled(event: MotionEvent): Boolean {
