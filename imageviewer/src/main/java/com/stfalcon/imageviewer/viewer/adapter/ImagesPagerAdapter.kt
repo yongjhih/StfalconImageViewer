@@ -33,7 +33,7 @@ internal class ImagesPagerAdapter<T>(
 ) : RecyclingPagerAdapter<ImagesPagerAdapter<T>.ViewHolder>() {
 
     private var images = _images
-    private val holders = mutableListOf<ViewHolder>()
+    val holders = mutableListOf<ViewHolder>()
 
     fun isScaled(position: Int): Boolean =
         holders.firstOrNull { it.position == position }?.isScaled ?: false

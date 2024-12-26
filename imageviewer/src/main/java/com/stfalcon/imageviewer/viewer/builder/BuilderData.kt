@@ -55,4 +55,5 @@ class BuilderData<T>(
     var onDoubleTap: ((MotionEvent) -> Boolean)? = null
     var onLongPress: ((MotionEvent) -> Unit)? = null
     var offset: Rect? = null
+    var isPreloadByTransitionEnabled: Boolean = true
 }

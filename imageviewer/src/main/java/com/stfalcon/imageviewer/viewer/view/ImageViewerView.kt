@@ -27,6 +27,7 @@ import android.widget.ImageView
 import android.widget.RelativeLayout
 import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.postDelayed
+import com.github.chrisbanes.photoview.PhotoView
 import com.stfalcon.imageviewer.R
 import com.stfalcon.imageviewer.common.extensions.addOnPageChangeListener
 import com.stfalcon.imageviewer.common.extensions.animateAlpha
@@ -284,7 +285,16 @@ class ImageViewerView<T> @JvmOverloads constructor(
         backgroundView.alpha = 1f
         imagesPager.makeVisible()
         // wait for imagesPager invalidated
-        postDelayed(200L) { transitionImageContainer.makeGone() }
+        postDelayed(200L) {
+            if (data.isPreloadByTransitionEnabled) {
+                (imagesAdapter?.holders?.getOrNull(startPosition)?.itemView as? ImageView)?.also { v ->
+                    this.transitionImageView.drawable?.let {
+                        if (v.drawable == null) v.setImageDrawable(it)
+                    }
+                }
+            }
+            transitionImageContainer.makeGone()
+        }
     }
 
     private fun handleTouchIfNotScaled(event: MotionEvent): Boolean {
