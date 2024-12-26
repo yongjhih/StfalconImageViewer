@@ -260,7 +260,16 @@ class ImageViewerView<T> @JvmOverloads constructor(
                 backgroundView.animateAlpha(0f, 1f, duration)
                 overlayView?.animateAlpha(0f, 1f, duration)
             },
-            onTransitionEnd = { prepareViewsForViewer() })
+            onTransitionEnd = {
+                if (data.isPreloadByTransitionEnabled) {
+                    (imagesAdapter?.holders?.getOrNull(startPosition)?.itemView as? ImageView)?.also { v ->
+                        this.transitionImageView.drawable?.let {
+                            if (v.drawable == null) v.setImageDrawable(it)
+                        }
+                    }
+                }
+                prepareViewsForViewer()
+            })
     }
 
     private fun animateClose() {
@@ -286,13 +295,6 @@ class ImageViewerView<T> @JvmOverloads constructor(
         imagesPager.makeVisible()
         // wait for imagesPager invalidated
         postDelayed(200L) {
-            if (data.isPreloadByTransitionEnabled) {
-                (imagesAdapter?.holders?.getOrNull(startPosition)?.itemView as? ImageView)?.also { v ->
-                    this.transitionImageView.drawable?.let {
-                        if (v.drawable == null) v.setImageDrawable(it)
-                    }
-                }
-            }
             transitionImageContainer.makeGone()
         }
     }
