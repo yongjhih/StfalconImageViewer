@@ -24,12 +24,19 @@ import android.view.View
 import android.view.ViewConfiguration
 import android.view.ViewGroup
 import androidx.core.graphics.Insets
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 
 internal val View?.localVisibleRect: Rect
     get() = Rect().also { this?.getLocalVisibleRect(it) }
 
 internal val View?.globalVisibleRect: Rect
     get() = Rect().also { this?.getGlobalVisibleRect(it) }
+
+val View.rootWindowInsetsCompat get() = ViewCompat.getRootWindowInsets(this)
+
+val View.systemBarsInsets: Insets? get() =
+    rootWindowInsetsCompat?.getInsets(WindowInsetsCompat.Type.systemBars())
 
 internal val View?.hitRect: Rect
     get() = Rect().also { this?.getHitRect(it) }

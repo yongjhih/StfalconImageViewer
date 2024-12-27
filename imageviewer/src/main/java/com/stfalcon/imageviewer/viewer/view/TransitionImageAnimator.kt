@@ -38,7 +38,9 @@ import com.stfalcon.imageviewer.common.extensions.makeViewMatchParent
 import com.stfalcon.imageviewer.common.extensions.postApply
 import com.stfalcon.imageviewer.common.extensions.postDelayed
 import com.stfalcon.imageviewer.common.extensions.requestNewSize
+import com.stfalcon.imageviewer.common.extensions.systemBarsInsets
 import com.stfalcon.imageviewer.viewer.builder.BuilderData
+import timber.log.Timber
 
 internal class TransitionImageAnimator(
     private val externalImage: ImageView?,
@@ -136,6 +138,12 @@ internal class TransitionImageAnimator(
 
     private fun prepareTransitionLayout() {
         externalImage?.let {
+            // Timber.v("it.systemBarsInsets: ${externalImage.systemBarsInsets}")
+            // Timber.v("internalImageContainer.systemBarsInsets: ${internalImageContainer.systemBarsInsets}")
+            // // it.systemBarsInsets: Insets{left=0, top=128, right=0, bottom=63}
+            // // internalImageContainer.systemBarsInsets: Insets{left=0, top=0, right=0, bottom=63}
+            val topOffset = (externalImage.systemBarsInsets?.top ?: 0) - (internalImageContainer.systemBarsInsets?.top ?: 0)
+            val bottomOffset = (externalImage.systemBarsInsets?.bottom ?: 0) - (internalImageContainer.systemBarsInsets?.bottom ?: 0)
             if (externalImage.isRectVisible) {
                 with(externalImage.localVisibleRect) {
                     internalImage.requestNewSize(it.width, it.height)
@@ -143,7 +151,7 @@ internal class TransitionImageAnimator(
                 }
                 with(externalImage.globalVisibleRect) {
                     internalImageContainer.requestNewSize(width(), height())
-                    internalImageContainer.applyMargin(left, top, right, bottom)
+                    internalImageContainer.applyMargin(left, top - topOffset, right, bottom - bottomOffset)
                 }
             }
 
