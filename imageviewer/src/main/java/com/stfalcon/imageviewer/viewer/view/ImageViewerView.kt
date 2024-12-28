@@ -201,7 +201,9 @@ class ImageViewerView<T> @JvmOverloads constructor(
     }
 
     internal fun open(transitionImageView: ImageView?, animate: Boolean) {
-        prepareViewsForTransition()
+        //prepareViewsForTransition()
+        transitionImageContainer.makeGone()
+        imagesPager.makeGone()
 
         externalTransitionImageView = transitionImageView
 
@@ -214,9 +216,7 @@ class ImageViewerView<T> @JvmOverloads constructor(
         this.swipeDismissHandler = swipeDismissHandler
         rootContainer.setOnTouchListener(swipeDismissHandler)
 
-        transitionImageContainer.makeGone()
-        imagesPager.makeGone()
-        postDelayed(100L) { // wait for cached async loadImage
+        postDelayed(150L) { // wait for cached async loadImage
             prepareViewsForTransition()
             if (animate) animateOpen() else prepareViewsForViewer()
         }

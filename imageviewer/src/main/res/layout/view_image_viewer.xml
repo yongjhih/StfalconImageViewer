@@ -33,13 +33,9 @@
         android:id="@+id/dismissContainer"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layoutDirection="ltr"
         >
 
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layoutDirection="ltr"
-            >
         <FrameLayout
             android:id="@+id/transitionImageContainer"
             android:layout_width="match_parent"
@@ -51,9 +47,9 @@
                 android:id="@+id/transitionImageView"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layoutDirection="ltr"
                 tools:ignore="ContentDescription"/>
 
-        </FrameLayout>
         </FrameLayout>
 
         <com.stfalcon.imageviewer.common.pager.MultiTouchViewPager
