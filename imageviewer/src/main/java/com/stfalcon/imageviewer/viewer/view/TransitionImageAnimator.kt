@@ -34,6 +34,7 @@ import com.stfalcon.imageviewer.common.extensions.applyMargin
 import com.stfalcon.imageviewer.common.extensions.globalVisibleRect
 import com.stfalcon.imageviewer.common.extensions.isRectVisible
 import com.stfalcon.imageviewer.common.extensions.localVisibleRect
+import com.stfalcon.imageviewer.common.extensions.locationOnScreen
 import com.stfalcon.imageviewer.common.extensions.makeViewMatchParent
 import com.stfalcon.imageviewer.common.extensions.postApply
 import com.stfalcon.imageviewer.common.extensions.postDelayed
@@ -94,12 +95,12 @@ internal class TransitionImageAnimator(
     private fun doOpenTransition(containerPadding: IntArray, onTransitionEnd: () -> Unit) {
         isAnimating = true
         prepareTransitionLayout()
+        val oldScaleType = internalImage.scaleType
+        internalImage.scaleType = externalImage?.scaleType ?: oldScaleType
         internalRoot.postApply {
-            val oldScaleType = internalImage.scaleType
             //ain't nothing but a kludge to prevent blinking when transition is starting
             externalImage?.postDelayed(50) { visibility = View.INVISIBLE }
 
-            internalImage.scaleType = externalImage?.scaleType ?: oldScaleType
             TransitionManager.beginDelayedTransition(internalRoot, createTransition {
                 if (!isClosing) {
                     isAnimating = false
@@ -127,8 +128,10 @@ internal class TransitionImageAnimator(
         val oldScaleType = internalImage.scaleType
         TransitionManager.beginDelayedTransition(
             internalRoot, createTransition {
-                handleCloseTransitionEnd(onTransitionEnd)
-                internalImage.scaleType = oldScaleType
+                handleCloseTransitionEnd {
+                    onTransitionEnd()
+                    internalImage.scaleType = oldScaleType
+                }
             })
         internalImage.scaleType = externalImage?.scaleType ?: oldScaleType
 
@@ -142,16 +145,32 @@ internal class TransitionImageAnimator(
             // Timber.v("internalImageContainer.systemBarsInsets: ${internalImageContainer.systemBarsInsets}")
             // // it.systemBarsInsets: Insets{left=0, top=128, right=0, bottom=63}
             // // internalImageContainer.systemBarsInsets: Insets{left=0, top=0, right=0, bottom=63}
+            // Timber.v("it.locationInWindow: ${externalImage.locationInWindow}")
+            // Timber.v("it.locationOnScreen: ${externalImage.locationOnScreen}")
+            // Timber.v("internalImageContainer.locationInWindow: ${internalImageContainer.locationInWindow}")
+            // Timber.v("internalImageContainer.locationOnScreen: ${internalImageContainer.locationOnScreen}")
+            // // it.locationInWindow: Point(157, 1341)
+            // // it.locationOnScreen: Point(157, 1341)
+            // // internalImageContainer.locationInWindow: Point(0, 0)
+            // // internalImageContainer.locationOnScreen: Point(0, 128)
             val topOffset = (externalImage.systemBarsInsets?.top ?: 0) - (internalImageContainer.systemBarsInsets?.top ?: 0)
-            val bottomOffset = (externalImage.systemBarsInsets?.bottom ?: 0) - (internalImageContainer.systemBarsInsets?.bottom ?: 0)
+            val externalImageLocation = externalImage.locationOnScreen
             if (externalImage.isRectVisible) {
+                //Timber.v("externalImageLocation: ${externalImageLocation}")
+                //Timber.v("externalImage.layoutDirection: ${externalImage.layoutDirection}")
+                //Timber.v("internalImage.layoutDirection: ${internalImage.layoutDirection}")
+                //Timber.v("internalImageContainer.layoutDirection: ${internalImageContainer.layoutDirection}")
                 with(externalImage.localVisibleRect) {
+                    //Timber.v("externalImage.localVisibleRect: $this")
+                    //internalImage.layoutDirection = View.LAYOUT_DIRECTION_LTR
                     internalImage.requestNewSize(it.width, it.height)
                     internalImage.applyMargin(top = -top, start = -left)
                 }
                 with(externalImage.globalVisibleRect) {
+                    //Timber.v("externalImage.globalVisibleRect: $this")
+                    //internalImageContainer.layoutDirection = View.LAYOUT_DIRECTION_LTR
                     internalImageContainer.requestNewSize(width(), height())
-                    internalImageContainer.applyMargin(left, top - topOffset, right, bottom - bottomOffset)
+                    internalImageContainer.applyMargin(left, top - topOffset, right, top - topOffset + height())
                 }
             }
 

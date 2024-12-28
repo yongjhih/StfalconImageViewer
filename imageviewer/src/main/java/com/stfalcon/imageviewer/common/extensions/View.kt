@@ -19,6 +19,7 @@ package com.stfalcon.imageviewer.common.extensions
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ObjectAnimator
+import android.graphics.Point
 import android.graphics.Rect
 import android.view.View
 import android.view.ViewConfiguration
@@ -32,6 +33,14 @@ internal val View?.localVisibleRect: Rect
 
 internal val View?.globalVisibleRect: Rect
     get() = Rect().also { this?.getGlobalVisibleRect(it) }
+
+internal val View.locationInWindow: Point
+    get() = IntArray(2).also { getLocationInWindow(it) }
+        .let { Point(it[0], it[1]) }
+
+internal val View.locationOnScreen: Point
+    get() = IntArray(2).also { getLocationOnScreen(it) }
+        .let { Point(it[0], it[1]) }
 
 val View.rootWindowInsetsCompat get() = ViewCompat.getRootWindowInsets(this)
 
