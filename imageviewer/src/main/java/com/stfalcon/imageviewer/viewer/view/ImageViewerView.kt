@@ -207,6 +207,7 @@ class ImageViewerView<T> @JvmOverloads constructor(
 
         externalTransitionImageView = transitionImageView
 
+        val now = System.currentTimeMillis()
         this.transitionImageView.copyBitmapFrom(transitionImageView)
         // async
         imageLoader?.loadImage(this.transitionImageView, images[startPosition])
@@ -216,7 +217,7 @@ class ImageViewerView<T> @JvmOverloads constructor(
         this.swipeDismissHandler = swipeDismissHandler
         rootContainer.setOnTouchListener(swipeDismissHandler)
 
-        postDelayed(150L) { // wait for cached async loadImage
+        postDelayed((data.transitionImageTimeout.inWholeMilliseconds - (System.currentTimeMillis() - now)).coerceAtLeast(0)) { // wait for cached async loadImage
             prepareViewsForTransition()
             if (animate) animateOpen() else prepareViewsForViewer()
         }

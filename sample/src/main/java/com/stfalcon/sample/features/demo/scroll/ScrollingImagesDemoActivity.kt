@@ -64,7 +64,6 @@ class ScrollingImagesDemoActivity : AppCompatActivity() {
                 data.onScaleType = { it?.scaleType }
                 data.onOpenBeforeScaleType = { it?.scaleType }
                 data.onOpenAfterScaleType = { ImageView.ScaleType.FIT_CENTER }
-                //data.offset = Rect(0, -120, 0,  0)
                 data.onTransition = {
                     TransitionSet().apply {
                         ordering = TransitionSet.ORDERING_SEQUENTIAL

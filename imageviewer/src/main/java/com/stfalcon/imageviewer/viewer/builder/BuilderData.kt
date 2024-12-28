@@ -27,6 +27,8 @@ import androidx.viewpager.widget.ViewPager
 import com.stfalcon.imageviewer.listeners.OnDismissListener
 import com.stfalcon.imageviewer.listeners.OnImageChangeListener
 import com.stfalcon.imageviewer.loader.ImageLoader
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 
 class BuilderData<T>(
     val images: List<T>,
@@ -54,6 +56,6 @@ class BuilderData<T>(
     var onSingleTap: ((MotionEvent) -> Boolean)? = null
     var onDoubleTap: ((MotionEvent) -> Boolean)? = null
     var onLongPress: ((MotionEvent) -> Unit)? = null
-    var offset: Rect? = null
     var isPreloadByTransitionEnabled: Boolean = true
+    var transitionImageTimeout: Duration = 100.milliseconds
 }
