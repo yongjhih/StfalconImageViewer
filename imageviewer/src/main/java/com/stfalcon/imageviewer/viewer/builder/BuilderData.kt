@@ -58,4 +58,5 @@ class BuilderData<T>(
     var onLongPress: ((MotionEvent) -> Unit)? = null
     var isPreloadByTransitionEnabled: Boolean = true
     var transitionImageTimeout: Duration = 100.milliseconds
+    var transitionManagerEnabled: Boolean = true
 }

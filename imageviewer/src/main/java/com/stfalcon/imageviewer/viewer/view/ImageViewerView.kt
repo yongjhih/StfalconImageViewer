@@ -400,7 +400,12 @@ class ImageViewerView<T> @JvmOverloads constructor(
         onSwipeViewMove = ::handleSwipeViewMove)
 
     private fun createTransitionImageAnimator(transitionImageView: ImageView?) =
-        TransitionImageAnimator(
+        if (data.transitionManagerEnabled) TransitionImageAnimator1(
+            externalImage = transitionImageView,
+            internalImage = this.transitionImageView,
+            internalImageContainer = this.transitionImageContainer,
+            data = data
+        ) else TransitionImageAnimator2(
             externalImage = transitionImageView,
             internalImage = this.transitionImageView,
             internalImageContainer = this.transitionImageContainer,
