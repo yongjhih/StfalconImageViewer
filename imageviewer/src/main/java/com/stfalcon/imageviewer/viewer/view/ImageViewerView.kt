@@ -219,6 +219,13 @@ class ImageViewerView<T> @JvmOverloads constructor(
 
         postDelayed((data.transitionImageTimeout.inWholeMilliseconds - (System.currentTimeMillis() - now)).coerceAtLeast(0)) { // wait for cached async loadImage
             prepareViewsForTransition()
+            if (data.isPreloadByTransitionEnabled) {
+                (imagesAdapter?.holders?.getOrNull(startPosition)?.itemView as? ImageView)?.also { v ->
+                    this.transitionImageView.drawable?.let {
+                        if (v.drawable == null) v.setImageDrawable(it)
+                    }
+                }
+            }
             if (animate) animateOpen() else prepareViewsForViewer()
         }
     }
